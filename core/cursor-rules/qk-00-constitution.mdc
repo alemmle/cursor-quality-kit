@@ -1,0 +1,20 @@
+---
+description: AI Code Constitution - binding rules for every agent and model in this repository
+alwaysApply: true
+---
+
+# AI Code Constitution
+
+`.ai/CONSTITUTION.md` and `AGENTS.md` are binding. Read them before your first edit in a session.
+
+Non-negotiable, regardless of model:
+
+- Read every file before you modify it. Do not rely on chat memory.
+- Non-trivial task: write the plan first (files, changes, risks, test plan). Execute one step at a time; run `./scripts/verify.sh` after each step.
+- Smallest diff that solves the task. Do not touch unrelated code. Do not create duplicate helpers, hooks, services, or components; search first.
+- Do not use any API, prop, config key, or CLI flag until you have confirmed it exists in the installed version (check `node_modules`, lockfile, or `pubspec.lock`).
+- Bug fix: write a failing test that reproduces it, then fix.
+- Never delete, skip, `.only`, or weaken tests. Never add `@ts-ignore`, `eslint-disable`, `any`, or `// ignore:` to get green.
+- Never run `git commit --no-verify` or edit `scripts/verify.sh` / `.ai/bin/guard.sh` to skip checks.
+- If `./scripts/verify.sh` fails twice for the same reason, stop and report instead of trying random fixes.
+- Final message: what changed, the exact verification commands you ran with their results, and what you did not verify.

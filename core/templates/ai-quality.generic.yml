@@ -1,0 +1,17 @@
+name: AI quality gate
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  constitution:
+    uses: {{KIT_REPO}}/.github/workflows/constitution.yml@{{KIT_REF}}
+    with:
+      kit-repo: {{KIT_REPO}}
+      kit-ref: {{KIT_REF}}

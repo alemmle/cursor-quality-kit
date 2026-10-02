@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# cursor-quality-kit: run the full verification gate before pushing.
+# Set QK_SKIP_PREPUSH=1 only if a human decides to skip it; CI still runs the gate.
+set -euo pipefail
+[ "${QK_SKIP_PREPUSH:-0}" = "1" ] && { echo "pre-push: skipped by QK_SKIP_PREPUSH=1"; exit 0; }
+root="$(git rev-parse --show-toplevel)"
+exec "$root/scripts/verify.sh"
