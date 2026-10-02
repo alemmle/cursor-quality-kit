@@ -20,6 +20,8 @@ Why this exists and how to use it with Grok: [docs/GROK-PLAYBOOK.md](docs/GROK-P
 | `.ai/CONSTITUTION.md` | The constitution ([source](CONSTITUTION.md)) | yes |
 | `.ai/bin/guard.sh` | Regression guard: blocks skipped/deleted tests, suppressions, `any`, secrets, gate edits, migration edits | yes |
 | `.ai/ACCEPTANCE.md`, `.ai/bin/accept.sh`, `.ai/bin/diff-review.sh` | Acceptance criteria and the ACCEPT / REJECT run (gate, guard, mechanical diff review) | yes |
+| `.ai/bin/agent-hook.sh` | Agent hook: reruns the gate when the agent tries to finish, blocks gate-bypassing and destructive commands | yes |
+| `.cursor/hooks.json`, `.claude/settings.json`, `.codex/hooks.json` | Run the agent hook in Cursor, Claude Code and Codex. If one exists without the kit entries, the installer warns and you merge them | created once |
 | `.github/instructions/qk-*.instructions.md` | Copilot path-specific instructions generated from the Cursor rules | yes |
 | `AGENTS.md` | Managed block with the rules summary, commands, skills, and stack rules. Your own content is kept | managed block only |
 | `CLAUDE.md`, `GEMINI.md`, `.github/copilot-instructions.md` | Thin adapters that point each tool at `AGENTS.md` and the constitution | managed block only |
@@ -98,7 +100,16 @@ Git hooks and CI apply regardless of tool. If you mainly use Codex, install with
 .ai/bin/guard.sh --base origin/main  # CI
 ```
 
-It blocks focused/skipped tests (Jest, Dart, pytest), suppressions (`@ts-ignore`, `eslint-disable`, `// ignore:`, `# noqa`, ...), explicit `any` in TypeScript, private keys, tokens, Postgres URLs with passwords, secrets in `EXPO_PUBLIC_*` variables, committed `.env` files, deleted test files, edits to the gate (`scripts/verify.sh`, `.ai/`, `.githooks/`, workflows), and edits to applied migrations.
+It blocks focused/skipped tests (Jest, Dart, pytest), suppressions (`@ts-ignore`, `eslint-disable`, `// ignore:`, `# noqa`, ...), explicit `any` in TypeScript, private keys, tokens, Postgres URLs with passwords, secrets in `EXPO_PUBLIC_*` variables, committed `.env` files, deleted test files, edits to the gate (`scripts/verify.sh`, `.ai/`, `.githooks/`, workflows, agent hook configs), and edits to applied migrations.
+
+## Agent hooks
+
+Git hooks only run at commit time. Agent hooks run inside the chat, so an agent cannot stop with a red gate. `.ai/bin/agent-hook.sh` is one script for all three tools:
+
+- `stop`: when the agent tries to finish and the code changed, runs `./scripts/verify.sh`. If the gate fails, the agent is sent back with the last 40 lines of output (Cursor `followup_message`; Claude Code and Codex `decision: "block"`). After 3 failed attempts (`AI_HOOK_STOP_MAX`) it lets the agent stop and report honestly instead of looping. Green results are cached per tree state.
+- `pre-shell`: blocks `--no-verify`, `GUARD_ALLOW_*` / `DIFF_ALLOW_*` / `HUSKY=0`, `core.hooksPath`, force-push, `eas submit`, production `eas update`, `neonctl branches delete|reset`, and `DROP`/`TRUNCATE` statements typed into a shell.
+
+Cursor also reads `.claude/settings.json`; the Claude-format entries ignore Cursor payloads so each hook runs once. Humans working in their own terminal are not affected. `AI_HOOK_DISABLE=1` turns the hooks off.
 
 A single line can be exempted with a comment containing `ai-guard: allow <reason>`. Whole checks can be overridden by a human with `GUARD_ALLOW_TEST_DELETION=1`, `GUARD_ALLOW_GATE_CHANGES=1`, `GUARD_ALLOW_MIGRATION_EDIT=1`, or in CI with the matching PR label. CI always runs the guard from this repository, so a PR cannot weaken it.
 
@@ -110,12 +121,12 @@ core/                      installed in every repository
   AGENTS.block.md          managed AGENTS.md block
   adapters/                CLAUDE.md, GEMINI.md, Copilot blocks
   ACCEPTANCE.md            acceptance criteria (same for every tool and model)
-  bin/                     guard.sh, diff-review.sh, accept.sh
+  bin/                     guard.sh, diff-review.sh, accept.sh, agent-hook.sh
   cursor-rules/            constitution (always on), scope, security, testing
   githooks/                pre-commit, pre-push
   skills/                  plan-small-change, fix-bug-with-regression-test, verify-before-done,
                            debugging-protocol, code-review, ai-regression-protocol
-  templates/               PROJECT_STATE.md, PR template, generic verify.sh and workflow
+  templates/               PROJECT_STATE.md, PR template, generic verify.sh and workflow, agent-hooks/
 shared/                    rules, skills, templates reused by several stacks (stack.conf picks them)
 stacks/<stack>/            stack.conf, AGENTS section, Cursor rules, skills, project templates
 .github/workflows/         reusable: constitution.yml, node-quality.yml, flutter-quality.yml;
