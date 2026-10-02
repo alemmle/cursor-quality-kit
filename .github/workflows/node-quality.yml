@@ -1,5 +1,5 @@
-# Reusable: runs the Expo / EAS verification gate (scripts/verify.sh) in the caller repository.
-name: Expo quality gate
+# Reusable: runs scripts/verify.sh for Node-based stacks (Expo / EAS apps and TypeScript backends).
+name: Node quality gate
 
 on:
   workflow_call:
@@ -12,13 +12,17 @@ on:
         type: string
         default: .
       skip-doctor:
-        description: Skip expo-doctor
+        description: Skip expo-doctor (Expo stack only)
         type: boolean
         default: false
       coverage:
-        description: Run Jest with coverage (thresholds come from the jest config)
+        description: Run tests with coverage (thresholds come from the test runner config)
         type: boolean
         default: false
+      build:
+        description: Run the build stage (Expo - expo export for iOS; backend - npm run build)
+        type: boolean
+        default: true
 
 permissions:
   contents: read
@@ -43,3 +47,4 @@ jobs:
           CI: 'true'
           VERIFY_SKIP_DOCTOR: ${{ inputs.skip-doctor && '1' || '0' }}
           VERIFY_COVERAGE: ${{ inputs.coverage && '1' || '0' }}
+          VERIFY_BUILD: ${{ inputs.build && '1' || '0' }}

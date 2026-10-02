@@ -7,7 +7,7 @@ description: Change the Neon Postgres schema safely with a reviewed migration, a
 
 ## 1. Plan the change as expand, then contract
 
-Installed iOS apps keep running old code for weeks. The database must work for the old and new app version at the same time.
+Installed mobile apps keep running old code for weeks, and during a deploy old and new server instances run side by side. The database must work for the old and new code at the same time.
 
 - **Expand:** add new tables/columns as nullable or with defaults. Old code keeps working.
 - **Migrate code:** server/API reads and writes the new shape; the app is updated.
