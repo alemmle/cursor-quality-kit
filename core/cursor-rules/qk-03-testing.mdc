@@ -1,0 +1,15 @@
+---
+description: Testing rules that apply to every stack and language
+alwaysApply: true
+---
+
+# Testing rules
+
+- Every behavior change ships with tests: the main path and at least one failure or edge path (empty data, network error, invalid input, unauthorized).
+- Every bug fix starts with a test that fails for the reported reason (skill: `fix-bug-with-regression-test`). Name the test after the behavior, not the ticket.
+- Test behavior through public interfaces (rendered UI, exported functions, HTTP responses), not private implementation details.
+- Mock only at boundaries you do not own: network, database driver, native modules, clock, randomness. Never mock the unit under test.
+- Tests are deterministic: no real network, no sleeps/timeouts as synchronization, fixed time and seeds.
+- Never skip, focus, delete, or weaken a test to make a change pass. Never regenerate snapshots or goldens without describing the accepted change.
+- Keep the pyramid: many unit tests, fewer component/widget/API tests, a few E2E flows for critical journeys.
+- Run the narrowest test first while iterating, then the full gate (`./scripts/verify.sh`) before reporting done.

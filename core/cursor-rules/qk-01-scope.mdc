@@ -1,0 +1,15 @@
+---
+description: Do not touch unrelated code - scope discipline for every change
+alwaysApply: true
+---
+
+# Do not touch unrelated code
+
+- Before editing, state the files you will change. Edit only those. If you need another file, say why first.
+- Do not reformat, reorder imports, rename, or "modernize" code you are not changing for the task. Formatting-only changes to untouched files are rejected in review.
+- Do not upgrade, add, or remove dependencies unless the task requires it. A lockfile change without a matching manifest change is rejected.
+- Do not change public interfaces (exported functions, component props, API routes, database schema) unless the task requires it; if it does, update every caller in the same change.
+- Do not delete code you think is unused unless the task says so. Report it instead.
+- Do not edit generated files (`ios/`, `android/` in Expo CNG projects, `*.g.dart`, build output); change the source that generates them.
+- Unrelated problems you notice go in the "Not changed / follow-ups" part of your report, not into the diff.
+- You can check scope mechanically: `.ai/bin/diff-review.sh --scope "<glob> <glob>"` rejects files outside the declared scope.
