@@ -232,17 +232,19 @@ expect_fail "check-install: missing agent hooks fail" 'does not run .ai/bin/agen
 
 echo "inventory"
 repo="$(new_repo inv-app)"
-mkdir -p "$repo/.cursor/rules" "$repo/src"
+mkdir -p "$repo/.cursor/rules" "$repo/.cursor/skills/handover" "$repo/src"
 printf 'Use expo-router.\n' >"$repo/.cursorrules"
 printf -- '---\ndescription: RN styling\n---\n' >"$repo/.cursor/rules/rn.mdc"
+printf -- '---\nname: handover\n---\n' >"$repo/.cursor/skills/handover/SKILL.md"
 printf '{\n "dependencies": {\n  "expo": "~57.0.0",\n  "@neondatabase/serverless": "^1.0.0",\n  "lodash": "4"\n }\n}\n' >"$repo/package.json"
 printf '{"expo":{}}\n' >"$repo/app.json"
 : >"$repo/src/a.test.tsx"
 git -C "$repo" add -A
 expect "inventory: runs" "$KIT/scripts/inventory.sh" --out "$work/inv" "$repo"
-expect "inventory: detects expo + neon" grep -q '| inv-app | expo | yes | 2 | 1 | 0 | no |' "$work/inv/REPORT.md"
+expect "inventory: detects expo + neon" grep -q '| inv-app | expo | yes | 3 | 1 | 0 | no |' "$work/inv/REPORT.md"
 expect "inventory: lists relevant packages only" bash -c "grep -q 'expo@~57.0.0 @neondatabase/serverless@' '$work/inv/REPORT.md' && ! grep -q lodash '$work/inv/REPORT.md'"
 expect "inventory: copies instruction files" test -f "$work/inv/files/inv-app/.cursor/rules/rn.mdc"
+expect "inventory: finds Cursor project skills" test -f "$work/inv/files/inv-app/.cursor/skills/handover/SKILL.md"
 
 echo "versioning"
 v="$(tr -d '[:space:]' <"$KIT/VERSION")"
