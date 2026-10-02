@@ -122,6 +122,6 @@ tests/run.sh               self-tests for the installer and guard
 
 ```bash
 tests/run.sh
-shellcheck scripts/*.sh tests/*.sh core/bin/guard.sh core/githooks/* core/templates/verify.generic.sh stacks/*/template/scripts/verify.sh
+shellcheck scripts/*.sh tests/*.sh core/bin/*.sh core/githooks/* core/templates/verify.generic.sh stacks/*/template/scripts/verify.sh
 actionlint
 ```

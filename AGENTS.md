@@ -15,7 +15,7 @@ This repository is **cursor-quality-kit**: the AI Code Constitution and the tool
 | Purpose | Command |
 | --- | --- |
 | Self-tests (installer, drift check, guard) | `tests/run.sh` |
-| Shell lint | `shellcheck scripts/*.sh tests/*.sh core/bin/guard.sh core/githooks/* core/templates/verify.generic.sh stacks/*/template/scripts/verify.sh` |
+| Shell lint | `shellcheck scripts/*.sh tests/*.sh core/bin/*.sh core/githooks/* core/templates/verify.generic.sh stacks/*/template/scripts/verify.sh` |
 | Workflow lint | `actionlint` |
 | Try the installer | `scripts/install.sh --stack expo-eas-neon /path/to/repo` |
 

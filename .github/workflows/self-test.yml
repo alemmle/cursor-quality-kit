@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v7
       - name: shellcheck
         if: runner.os == 'Linux'
-        run: shellcheck scripts/*.sh tests/*.sh core/bin/guard.sh core/githooks/* core/templates/verify.generic.sh stacks/*/template/scripts/verify.sh
+        run: shellcheck scripts/*.sh tests/*.sh core/bin/*.sh core/githooks/* core/templates/verify.generic.sh stacks/*/template/scripts/verify.sh
       - name: actionlint
         if: runner.os == 'Linux'
         run: |
