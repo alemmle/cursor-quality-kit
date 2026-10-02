@@ -1,0 +1,43 @@
+name: Roll out
+
+# Installs this kit into every repository listed in rollout/ and opens or refreshes one
+# draft pull request per repository (scripts/rollout.sh). Runs when a new VERSION or a
+# rollout/ change lands on main, or by hand. Needs the KIT_BOT_TOKEN secret (see README).
+
+on:
+  push:
+    branches: [main]
+    paths: ['VERSION', 'rollout/**']
+  workflow_dispatch:
+    inputs:
+      repos:
+        description: 'Space-separated owner/name list (default: every repository in rollout/)'
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rollout
+  cancel-in-progress: false
+
+jobs:
+  rollout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Require token
+        env:
+          GH_TOKEN: ${{ secrets.KIT_BOT_TOKEN }}
+        run: |
+          [ -n "$GH_TOKEN" ] || { echo "::error::Add the KIT_BOT_TOKEN secret (see README, 'Roll out to your repositories')"; exit 1; }
+      - uses: actions/checkout@v7
+      - name: Install into repositories
+        env:
+          GH_TOKEN: ${{ secrets.KIT_BOT_TOKEN }}
+          REPOS: ${{ inputs.repos }}
+          KIT_REPO: ${{ github.repository }}
+        run: |
+          gh auth setup-git
+          # shellcheck disable=SC2086 # word-split the repository list on purpose
+          scripts/rollout.sh $REPOS

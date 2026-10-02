@@ -291,6 +291,44 @@ expect "install: promoted skill replaces the app copy" bash -c "test -f '$app/.c
 expect "install: pending amendment kept and listed" bash -c "test -f '$app/.cursor/rules/amend-qk-03-testing.mdc' && grep -q 'pending .*amend-qk-03-testing' '$work/promote.out'"
 expect "install: unmarked project rule kept" test -f "$app/.cursor/rules/local-only.mdc"
 
+echo "install options for existing projects"
+repo="$(new_repo own-config)"
+mkdir -p "$repo/.claude"
+printf '{"enabledPlugins":{"x":true},"hooks":{"SessionStart":[{"hooks":[{"type":"command","command":"own.sh"}]}]}}\n' >"$repo/.claude/settings.json"
+printf '{"name":"a","scripts":{"gate":"true"},"jest":{"preset":"jest-expo"}}\n' >"$repo/package.json"
+expect "install with --verify-cmd" "$KIT/scripts/install.sh" --stack expo-eas-neon --verify-cmd "npm run gate" "$repo"
+if command -v jq >/dev/null 2>&1; then
+  expect "hooks: kit entries merged into existing settings" bash -c "jq -e '.enabledPlugins.x and (.hooks.SessionStart|length==1) and (.hooks.Stop|length==1) and (.hooks.PreToolUse|length==1)' '$repo/.claude/settings.json'"
+  expect "hooks: merged config passes check-install" "$KIT/scripts/check-install.sh" "$repo"
+fi
+expect "verify-cmd: verify.sh runs guard then project checks" bash -c "grep -q 'guard.sh --worktree' '$repo/scripts/verify.sh' && tail -n 1 '$repo/scripts/verify.sh' | grep -qx 'npm run gate'"
+expect "own jest config: no second jest config added" test ! -e "$repo/jest.config.js"
+commit_all "$repo" "install"
+"$KIT/scripts/install.sh" --stack expo-eas-neon --verify-cmd "npm run gate" "$repo" >/dev/null
+expect "own config: re-install is a no-op" test -z "$(git -C "$repo" status --porcelain)"
+
+echo "rollout"
+remotes="$work/remotes"
+mkdir -p "$remotes/acme"
+src="$(new_repo rollout-src)"
+mkdir -p "$src/.cursor/skills/scope-control"
+echo '# app' >"$src/AGENTS.md"
+echo 'x' >"$src/.cursor/skills/scope-control/SKILL.md"
+commit_all "$src" "app"
+git clone -q --bare "$src" "$remotes/acme/app.git"
+kit3="$work/kit3"
+cp -R "$KIT" "$kit3"
+rm -f "$kit3"/rollout/*
+printf 'stack=none\nverify=npm test\n' >"$kit3/rollout/acme__app.conf"
+printf '# superseded\n.cursor/skills/scope-control\n.cursor/skills/not-there\n' >"$kit3/rollout/acme__app.remove"
+printf 'Follow-up note.\n' >"$kit3/rollout/acme__app.md"
+expect "rollout: dry run" env ROLLOUT_REMOTE_BASE="$remotes" "$kit3/scripts/rollout.sh" --dry-run --work "$work/ro"
+expect "rollout: installs on the branch" bash -c "git -C '$work/ro/acme__app' log -1 --format=%s quality-kit/install | grep -q 'Install cursor-quality-kit'"
+expect "rollout: superseded path removed" test ! -e "$work/ro/acme__app/.cursor/skills/scope-control"
+expect "rollout: verify-cmd applied" bash -c "tail -n 1 '$work/ro/acme__app/scripts/verify.sh' | grep -qx 'npm test'"
+expect "rollout: body lists removal and notes" bash -c "grep -q 'scope-control' '$work/ro/acme__app.body.md' && grep -q 'Follow-up note.' '$work/ro/acme__app.body.md' && ! grep -q 'not-there' '$work/ro/acme__app.body.md'"
+expect_fail "rollout: missing conf fails" "missing" env ROLLOUT_REMOTE_BASE="$remotes" "$kit3/scripts/rollout.sh" --dry-run --work "$work/ro2" acme/other
+
 echo "versioning"
 v="$(tr -d '[:space:]' <"$KIT/VERSION")"
 expect "VERSION matches CONSTITUTION.md" grep -qx "Version: $v" "$KIT/CONSTITUTION.md"
