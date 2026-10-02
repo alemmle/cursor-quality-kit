@@ -1,0 +1,68 @@
+name: Harvest proposals
+
+# Collects rules and skills that app repositories mark with `quality-kit:propose`
+# (see core/skills/capture-learning) and opens one pull request per proposal here.
+# Needs the KIT_HARVEST_TOKEN secret: a fine-grained token with Contents read on the
+# app repositories and Contents + Pull requests write on this one. GITHUB_TOKEN cannot
+# read other private repositories, and pull requests it opens do not run Self-test.
+
+on:
+  schedule:
+    - cron: '17 5 * * *'
+  workflow_dispatch:
+    inputs:
+      repos:
+        description: 'Space-separated owner/name list (default: every repository of the owner with .ai/KIT_VERSION)'
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: harvest
+  cancel-in-progress: false
+
+jobs:
+  harvest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Require token
+        env:
+          GH_TOKEN: ${{ secrets.KIT_HARVEST_TOKEN }}
+        run: |
+          [ -n "$GH_TOKEN" ] || { echo "::error::Add the KIT_HARVEST_TOKEN secret (see the comment at the top of harvest.yml)"; exit 1; }
+      - uses: actions/checkout@v7
+        with:
+          token: ${{ secrets.KIT_HARVEST_TOKEN }}
+      - name: Find repositories
+        id: find
+        env:
+          GH_TOKEN: ${{ secrets.KIT_HARVEST_TOKEN }}
+          REPOS: ${{ inputs.repos }}
+        run: |
+          if [ -z "$REPOS" ]; then
+            for r in $(gh repo list "$GITHUB_REPOSITORY_OWNER" --limit 500 --no-archived --json nameWithOwner --jq '.[].nameWithOwner'); do
+              [ "$r" = "$GITHUB_REPOSITORY" ] && continue
+              gh api "repos/$r/contents/.ai/KIT_VERSION" --silent 2>/dev/null && REPOS="$REPOS $r"
+            done
+          fi
+          echo "Repositories:$REPOS"
+          echo "repos=$REPOS" >>"$GITHUB_OUTPUT"
+      - name: Collect proposals
+        if: steps.find.outputs.repos != ''
+        env:
+          GH_TOKEN: ${{ secrets.KIT_HARVEST_TOKEN }}
+          REPOS: ${{ steps.find.outputs.repos }}
+        run: |
+          gh auth setup-git
+          # shellcheck disable=SC2086 # word-split the repository list on purpose
+          scripts/harvest.sh --out "$RUNNER_TEMP/harvest" $REPOS
+      - name: Open pull requests
+        if: steps.find.outputs.repos != ''
+        env:
+          GH_TOKEN: ${{ secrets.KIT_HARVEST_TOKEN }}
+        run: |
+          git config user.name "quality-kit-harvest"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          scripts/harvest-pr.sh "$RUNNER_TEMP/harvest"

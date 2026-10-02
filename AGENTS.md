@@ -10,6 +10,10 @@ This repository is **cursor-quality-kit**: the AI Code Constitution and the tool
 - Changing `CONSTITUTION.md`, `core/bin/guard.sh`, or `core/cursor-rules/qk-00-constitution.mdc` changes what CI enforces in every repository: bump `VERSION` and describe the change in the PR.
 - Templates use `{{KIT_REPO}}`, `{{KIT_REF}}`, `{{IOS_BUNDLE_ID}}`, `{{SKILLS_DIR}}`, `{{VERSION}}`, and whole-line `{{SKILLS}}` / `{{STACK_SECTION}}`. Add new placeholders in `render()` in `scripts/install.sh` and in the placeholder test in `tests/run.sh`.
 
+## Harvest pull requests
+
+Branches named `harvest/<repo>-<name>-<hash>` hold a rule or skill proposed by an app repository (see `core/skills/capture-learning`). Work the checklist in the pull request body on that branch. Rewrite the text so it is generic for its scope, and fold it into an existing rule if one already covers it. If it belongs in a stack, move it to `stacks/<stack>/`; if it is app-specific, close the pull request. Then update `VERSION` and `CHANGELOG.md`. Never merge a proposal unedited without checking that every claim in it holds.
+
 ## Commands
 
 | Purpose | Command |

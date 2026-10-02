@@ -263,6 +263,42 @@ while IFS= read -r d; do
   say managed "$skills_dir/$name/"
 done < <(skill_dirs)
 
+echo "Proposals for the kit (core/skills/capture-learning)"
+PROPOSAL='^<!-- quality-kit:propose (core|stack)( amends [A-Za-z0-9._-]+)? -->'
+proposal_line() { grep -m1 -E "$PROPOSAL" "$1" 2>/dev/null || true; }
+for f in "$target"/.cursor/rules/*.mdc; do
+  [ -f "$f" ] || continue
+  n="$(basename "$f" .mdc)"
+  case "$n" in qk-*) continue ;; esac
+  line="$(proposal_line "$f")"
+  case "$line" in
+    "") ;;
+    *" amends "*) say pending ".cursor/rules/$n.mdc amends a kit rule; delete it once its harvest pull request is merged or closed" ;;
+    *) if [ -f "$target/.cursor/rules/qk-$n.mdc" ]; then
+         rm -f "$f"; say removed ".cursor/rules/$n.mdc (the kit now ships it as qk-$n.mdc)"
+       else
+         say pending ".cursor/rules/$n.mdc"
+       fi ;;
+  esac
+done
+for root in .claude/skills .cursor/skills .agents/skills; do
+  for s in "$target/$root"/*/SKILL.md; do
+    [ -f "$s" ] || continue
+    n="$(basename "$(dirname "$s")")"
+    grep -qxF "$root/$n" "$manifest" && continue
+    line="$(proposal_line "$s")"
+    case "$line" in
+      "") ;;
+      *" amends "*) say pending "$root/$n/ amends a kit skill; delete it once its harvest pull request is merged or closed" ;;
+      *) if grep -qxF "$skills_dir/$n" "$manifest"; then
+           rm -rf "${target:?}/$root/$n"; say removed "$root/$n/ (the kit now ships it as $skills_dir/$n/)"
+         else
+           say pending "$root/$n/"
+         fi ;;
+    esac
+  done
+done
+
 echo "Git hooks"
 for h in pre-commit pre-push; do
   if [ -e "$target/.githooks/$h" ] && [ "$force" != "1" ] && ! grep -q 'cursor-quality-kit' "$target/.githooks/$h"; then
