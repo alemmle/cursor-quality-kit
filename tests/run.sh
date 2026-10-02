@@ -34,13 +34,17 @@ new_repo() {
 commit_all() { git -C "$1" add -A && git -C "$1" commit -qm "${2:-change}"; }
 
 echo "installer"
-for stack in none expo-eas-neon flutter; do
+for stack in none expo-eas-neon flutter backend; do
   repo="$(new_repo "install-$stack")"
   printf '# My app\n\nProject notes that must survive.\n' >"$repo/AGENTS.md"
   expect "install --stack $stack" "$KIT/scripts/install.sh" --stack "$stack" "$repo"
   expect "$stack: existing AGENTS.md content kept" grep -q 'Project notes that must survive.' "$repo/AGENTS.md"
   expect "$stack: managed block present" grep -qF '<!-- quality-kit:begin -->' "$repo/AGENTS.md"
   expect "$stack: constitution installed" cmp -s "$KIT/CONSTITUTION.md" "$repo/.ai/CONSTITUTION.md"
+  expect "$stack: acceptance criteria installed" cmp -s "$KIT/core/ACCEPTANCE.md" "$repo/.ai/ACCEPTANCE.md"
+  expect "$stack: accept.sh executable" test -x "$repo/.ai/bin/accept.sh"
+  expect "$stack: copilot constitution applies everywhere" grep -qx 'applyTo: "\*\*"' "$repo/.github/instructions/qk-00-constitution.instructions.md"
+  expect "$stack: one copilot file per cursor rule" test "$(find "$repo/.cursor/rules" -name 'qk-*.mdc' | wc -l)" = "$(find "$repo/.github/instructions" -name 'qk-*.instructions.md' | wc -l)"
   expect "$stack: verify.sh executable" test -x "$repo/scripts/verify.sh"
   expect "$stack: hooks path set" test "$(git -C "$repo" config core.hooksPath)" = ".githooks"
   expect "$stack: no unrendered placeholders" bash -c "! grep -rn '{{[A-Z_]*}}' '$repo' --exclude-dir=.git"
@@ -51,12 +55,27 @@ for stack in none expo-eas-neon flutter; do
   expect "$stack: exactly one managed block" test "$(grep -c 'quality-kit:begin' "$repo/AGENTS.md")" = "1"
 done
 
+repo="$work/install-backend"
+expect "backend: shared neon rule installed" test -f "$repo/.cursor/rules/qk-11-neon-postgres.mdc"
+expect "backend: shared neon skill installed" test -f "$repo/.claude/skills/neon-schema-change/SKILL.md"
+expect "backend: shared neon workflow installed" test -f "$repo/.github/workflows/neon-preview-db.yml"
+expect "backend: no expo rules" test ! -e "$repo/.cursor/rules/qk-10-expo-react-native.mdc"
+repo="$work/install-flutter"
+expect "flutter: no typescript rule" test ! -e "$repo/.cursor/rules/qk-05-typescript.mdc"
+
+repo="$(new_repo eas)"
+printf '{ "build": { "production": {} } }\n' >"$repo/eas.json"
+"$KIT/scripts/install.sh" --stack expo-eas-neon "$repo" >/dev/null
+expect "expo: e2e-test profile added to eas.json" node -e 'process.exit(require(process.argv[1]).build["e2e-test"].ios.simulator ? 0 : 1)' "$repo/eas.json"
+expect "expo: existing eas.json profiles kept" node -e 'process.exit(require(process.argv[1]).build.production ? 0 : 1)' "$repo/eas.json"
+expect "expo: copilot globs expanded" grep -q 'applyTo: "\*\*/\*.ts,\*\*/\*.tsx,' "$repo/.github/instructions/qk-05-typescript.instructions.md"
+
 repo="$work/install-expo-eas-neon"
 expect "expo: stack skills installed" test -f "$repo/.claude/skills/neon-schema-change/SKILL.md"
 expect "expo: stack rules installed" test -f "$repo/.cursor/rules/qk-11-neon-postgres.mdc"
 # shellcheck disable=SC2016 # literal backticks
 expect "expo: skills listed in AGENTS.md" grep -qF -- '- `expo-ios-feature` -' "$repo/AGENTS.md"
-expect "expo: workflow points at kit repo" grep -q 'alemmle/cursor-quality-kit/.github/workflows/expo-quality.yml@main' "$repo/.github/workflows/ai-quality.yml"
+expect "expo: workflow points at kit repo" grep -q 'alemmle/cursor-quality-kit/.github/workflows/node-quality.yml@main' "$repo/.github/workflows/ai-quality.yml"
 
 "$KIT/scripts/install.sh" --stack none "$repo" >/dev/null
 expect "switching stack removes stale skills" test ! -e "$repo/.claude/skills/neon-schema-change"
@@ -136,6 +155,45 @@ git -C "$repo" checkout -q -b feature
 printf "it.skip('x', () => {});\n" >>"$repo/src/a.test.ts"
 git -C "$repo" commit -qam "skip it" --no-verify
 expect_fail "base mode scans branch commits" 'Focused or skipped' g .ai/bin/guard.sh --base main
+
+echo "diff-review and accept"
+repo="$(new_repo review)"
+"$KIT/scripts/install.sh" --stack none "$repo" >/dev/null
+printf '#!/usr/bin/env bash\nexit 0\n' >"$repo/scripts/verify.sh"
+mkdir -p "$repo/src/cart" "$repo/src/other"
+printf 'export const a = 1;\n' >"$repo/src/cart/a.ts"
+printf 'export const o = 1;\n' >"$repo/src/other/o.ts"
+printf '{ "name": "x" }\n' >"$repo/package.json"
+printf '{}\n' >"$repo/package-lock.json"
+commit_all "$repo" "baseline"
+git -C "$repo" checkout -q -b feature
+dr() { (cd "$repo" && .ai/bin/diff-review.sh --base main "$@"); }
+
+expect "diff-review: empty diff passes" dr
+printf 'export const b = 2;\n' >>"$repo/src/cart/a.ts"
+expect_fail "diff-review: source without tests rejected" 'no tests were added' dr
+expect "diff-review: no-tests override" env DIFF_ALLOW_NO_TESTS=1 bash -c "cd '$repo' && .ai/bin/diff-review.sh --base main"
+printf "test('b', () => {});\n" >"$repo/src/cart/a.test.ts"
+expect "diff-review: source with tests passes" dr
+expect "diff-review: in-scope passes" dr --scope "src/cart/*"
+printf 'export  const o = 1;\n' >"$repo/src/other/o.ts"
+expect_fail "diff-review: formatting-only churn rejected" 'formatting/whitespace-only' dr
+expect_fail "diff-review: out-of-scope rejected" 'outside the declared scope' dr --scope "src/cart/*"
+git -C "$repo" checkout -q src/other/o.ts
+printf '{ "x": 1 }\n' >"$repo/package-lock.json"
+expect_fail "diff-review: lockfile without manifest rejected" 'lockfile changed without manifest' dr
+printf '{ "name": "x", "version": "1.0.0" }\n' >"$repo/package.json"
+expect "diff-review: lockfile with manifest passes" dr
+expect_fail "diff-review: size limit" 'diff too large' env DIFF_MAX_FILES=2 bash -c "cd '$repo' && .ai/bin/diff-review.sh --base main"
+expect "diff-review: docs always in scope" bash -c "printf 'x\n' >>'$repo/AGENTS.md' && cd '$repo' && .ai/bin/diff-review.sh --base main --scope 'src/cart/* package.json package-lock.json'"
+expect "accept: ACCEPT when all stages pass" bash -c "cd '$repo' && .ai/bin/accept.sh --base main | tail -1 | grep -qx ACCEPT"
+printf "it.only('x', () => {});\n" >>"$repo/src/cart/a.test.ts"
+expect_fail "accept: REJECT when the guard fails" '^REJECT$' bash -c "cd '$repo' && .ai/bin/accept.sh --base main"
+
+echo "versioning"
+v="$(tr -d '[:space:]' <"$KIT/VERSION")"
+expect "VERSION matches CONSTITUTION.md" grep -qx "Version: $v" "$KIT/CONSTITUTION.md"
+expect "VERSION has a CHANGELOG entry" grep -qx "## $v" "$KIT/CHANGELOG.md"
 
 printf '\n%d passed, %d failed\n' "$passed" "$failed"
 [ "$failed" -eq 0 ]

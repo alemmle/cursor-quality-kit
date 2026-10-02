@@ -23,7 +23,10 @@ same() { # same <kit-file> <repo-file> <label>
 echo "AI Code Constitution check ($(tr -d '[:space:]' <"$KIT_DIR/VERSION"))"
 
 same "$KIT_DIR/CONSTITUTION.md" ".ai/CONSTITUTION.md" "constitution"
+same "$KIT_DIR/core/ACCEPTANCE.md" ".ai/ACCEPTANCE.md" "acceptance criteria"
 same "$KIT_DIR/core/bin/guard.sh" ".ai/bin/guard.sh" "regression guard"
+same "$KIT_DIR/core/bin/diff-review.sh" ".ai/bin/diff-review.sh" "diff review"
+same "$KIT_DIR/core/bin/accept.sh" ".ai/bin/accept.sh" "acceptance pipeline"
 same "$KIT_DIR/core/cursor-rules/qk-00-constitution.mdc" ".cursor/rules/qk-00-constitution.mdc" "cursor rule"
 
 for f in AGENTS.md CLAUDE.md; do
