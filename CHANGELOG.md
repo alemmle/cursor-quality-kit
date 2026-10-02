@@ -2,6 +2,17 @@
 
 Versioning policy: [docs/VERSIONING.md](docs/VERSIONING.md).
 
+## 1.3.0
+
+Rules reconciled from the owner's app repositories (`docs/RECONCILIATION.md`). Like 1.2.0, this ships before any tag exists, so the new guard pattern is a minor bump; after the first tagged release it would be major.
+
+- Guard: `EXPO_PUBLIC_*` variables naming `OPENAI` or `ANTHROPIC` are blocked (AI provider keys are never public).
+- Installer: an existing `.githooks/pre-commit` or `pre-push` that is not the kit's is kept with a warning instead of being overwritten (`--force` still replaces it).
+- Inventory: reports Cursor project skills in `.cursor/skills/`.
+- New core rule `qk-04-ci-workflows` (same gate in CI, least privilege, pinned actions, gated releases) and core skill `orchestrate-workers` (partition, brief, and re-verify parallel worker agents).
+- Testing rule and `verify-before-done`: say what each kind of check proves, judge the committed state, report failed tool calls, run date logic under a non-UTC timezone.
+- Expo stack: read the docs for the installed SDK; keep business logic in native-free modules. Flutter stack: widget tests at 200% text scale with tap-target guidelines.
+
 ## 1.2.0
 
 Released before any repository consumed 1.x, so the stricter checks below ship as a minor version. After the first tagged release they would be major (see the versioning policy).
