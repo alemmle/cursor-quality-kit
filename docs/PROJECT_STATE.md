@@ -6,8 +6,8 @@ Central repository for the AI Code Constitution (version in `VERSION`) and the r
 
 ## Status
 
-- Constitution v1.0.0.
-- Stacks: `expo-eas-neon`, `flutter`, `none`.
+- Constitution v1.1.0 (see `CHANGELOG.md`): adds the acceptance pipeline (`.ai/bin/accept.sh`, `.ai/bin/diff-review.sh`).
+- Stacks: `expo-eas-neon`, `flutter`, `backend`, `none`.
 - Verified end to end on 2026-10-02:
   - Expo SDK 57 app from `create-expo-app` (React Native 0.86, TypeScript 6, RNTL 14, ESLint 9): install, `scripts/verify.sh` green, pre-commit guard blocks seeded violations.
   - Flutter 3.x stable app from `flutter create` (Dart 3.13): install, `scripts/verify.sh` green, stricter `analysis_options.yaml` template passes, guard blocks `// ignore:`.

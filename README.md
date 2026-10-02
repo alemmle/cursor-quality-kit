@@ -8,6 +8,7 @@ Stack packs:
 
 - `expo-eas-neon`: Expo / React Native iOS apps built with EAS, backed by Neon Postgres
 - `flutter`: Flutter / Dart apps
+- `backend`: TypeScript Node API backed by Neon Postgres
 - `none`: constitution, guard, and hooks only (add your own `scripts/verify.sh` checks)
 
 Why this exists and how to use it with Grok: [docs/GROK-PLAYBOOK.md](docs/GROK-PLAYBOOK.md).
@@ -18,6 +19,8 @@ Why this exists and how to use it with Grok: [docs/GROK-PLAYBOOK.md](docs/GROK-P
 | --- | --- | --- |
 | `.ai/CONSTITUTION.md` | The constitution ([source](CONSTITUTION.md)) | yes |
 | `.ai/bin/guard.sh` | Regression guard: blocks skipped/deleted tests, suppressions, `any`, secrets, gate edits, migration edits | yes |
+| `.ai/ACCEPTANCE.md`, `.ai/bin/accept.sh`, `.ai/bin/diff-review.sh` | Acceptance criteria and the ACCEPT / REJECT run (gate, guard, mechanical diff review) | yes |
+| `.github/instructions/qk-*.instructions.md` | Copilot path-specific instructions generated from the Cursor rules | yes |
 | `AGENTS.md` | Managed block with the rules summary, commands, skills, and stack rules. Your own content is kept | managed block only |
 | `CLAUDE.md`, `GEMINI.md`, `.github/copilot-instructions.md` | Thin adapters that point each tool at `AGENTS.md` and the constitution | managed block only |
 | `.cursor/rules/qk-*.mdc` | Cursor rules (always-on constitution + file-scoped stack rules) | yes |
@@ -65,7 +68,7 @@ For Flutter use `--stack flutter`; for anything else use `--stack none` and put 
 
 3. **Require the checks.** In each repository's branch protection (or a ruleset for all repositories), require the `constitution` and `verify` checks from the "AI quality gate" workflow on `main`.
 4. **Create the override labels** humans use to approve exceptions: `ai-test-deletion-approved`, `ai-gate-change-approved`, `ai-migration-edit-approved`.
-5. **Pin a version.** Tag releases here (`git tag v1.0.0 && git push --tags`) and install with `--kit-ref v1.0.0` so a change to the kit cannot break every repository at once.
+5. **Pin a version.** Tag releases here (the `release` workflow tags `vX.Y.Z` from `VERSION` and moves `vX`) and install with `--kit-ref v1` so a change to the kit cannot break every repository at once.
 6. **Global fallback in Cursor.** For repositories that do not have the kit yet, paste the hard rules from [CONSTITUTION.md](CONSTITUTION.md) into Cursor Settings > Rules (user rules), or into team rules in the Cursor dashboard if you are on a team plan.
 
 ### Updating
@@ -106,13 +109,17 @@ CONSTITUTION.md            the constitution (source of truth)
 core/                      installed in every repository
   AGENTS.block.md          managed AGENTS.md block
   adapters/                CLAUDE.md, GEMINI.md, Copilot blocks
-  bin/guard.sh             regression guard
-  cursor-rules/            always-on Cursor rule
+  ACCEPTANCE.md            acceptance criteria (same for every tool and model)
+  bin/                     guard.sh, diff-review.sh, accept.sh
+  cursor-rules/            constitution (always on), scope, security, testing
   githooks/                pre-commit, pre-push
-  skills/                  plan-small-change, fix-bug-with-regression-test, verify-before-done
+  skills/                  plan-small-change, fix-bug-with-regression-test, verify-before-done,
+                           debugging-protocol, code-review, ai-regression-protocol
   templates/               PROJECT_STATE.md, PR template, generic verify.sh and workflow
-stacks/<stack>/            AGENTS section, Cursor rules, skills, project templates
-.github/workflows/         reusable: constitution.yml, expo-quality.yml, flutter-quality.yml; self-test.yml
+shared/                    rules, skills, templates reused by several stacks (stack.conf picks them)
+stacks/<stack>/            stack.conf, AGENTS section, Cursor rules, skills, project templates
+.github/workflows/         reusable: constitution.yml, node-quality.yml, flutter-quality.yml;
+                           self-test.yml, release.yml
 scripts/install.sh         install / update a repository
 scripts/check-install.sh   drift check used by CI
 tests/run.sh               self-tests for the installer and guard
