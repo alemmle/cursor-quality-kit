@@ -68,7 +68,7 @@ For Flutter use `--stack flutter`; for anything else use `--stack none` and put 
 
    `rollout/<owner>__<name>.remove` (optional) lists paths the kit supersedes; they are deleted in the same pull request, so nothing is covered twice. `rollout/<owner>__<name>.md` (optional) is added to the pull request description, for follow-ups that need judgment.
    The Roll out workflow runs on every new `VERSION` or `rollout/` change on `main`, or by hand under Actions > Roll out. It runs `scripts/rollout.sh`, which clones each repository, deletes the superseded paths, and runs `install.sh`. It then opens a draft pull request from `quality-kit/install`, or refreshes the one already open. Try it without pushing: `scripts/rollout.sh --dry-run alemmle/my-app`.
-   It needs the Actions secret `KIT_BOT_TOKEN`: a fine-grained personal access token with **Contents**, **Pull requests** and **Workflows** read and write on the app repositories, and **Contents** and **Pull requests** read and write on this repository. The same token runs the harvest. A new app needs only a `.conf` file here; merging it opens the install pull request.
+   It needs the Actions secret `KIT_BOT_TOKEN`: a fine-grained personal access token with **Contents**, **Pull requests** and **Workflows** read and write on the app repositories, and **Contents** and **Pull requests** read and write on this repository. The same token runs the harvest. A new app needs only a `.conf` file here; merging it opens the install pull request. The click-by-click version, including the local hook command, is [docs/HOW-TO-NEW-APP.md](docs/HOW-TO-NEW-APP.md).
 
 3. **Require the checks.** In each repository's branch protection (or a ruleset for all repositories), require the `constitution` and `verify` checks from the "AI quality gate" workflow on `main`.
 4. **Create the override labels** humans use to approve exceptions: `ai-test-deletion-approved`, `ai-gate-change-approved`, `ai-migration-edit-approved`.
@@ -175,6 +175,7 @@ scripts/harvest.sh         collect rules and skills that repositories propose fo
 scripts/harvest-pr.sh      open one kit pull request per proposal (used by harvest.yml)
 scripts/rollout.sh         install the kit into every repository in rollout/ (used by rollout.yml)
 rollout/                   per repository: stack and options, superseded paths, PR notes
+docs/HOW-TO-NEW-APP.md     steps for installing the kit into a new repository
 tests/run.sh               self-tests for the installer and guard
 ```
 
