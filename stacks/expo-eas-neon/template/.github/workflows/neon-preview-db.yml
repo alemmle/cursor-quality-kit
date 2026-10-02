@@ -1,0 +1,53 @@
+# One Neon branch per pull request: migrations and database tests run against it,
+# and it is deleted when the PR closes. Production data is never touched.
+#
+# Setup: repository variable NEON_PROJECT_ID, repository secret NEON_API_KEY,
+# and package.json scripts "db:migrate" (required) and "test:db" (optional).
+# Secrets are not available to pull requests from forks, so this skips them.
+name: Neon preview database
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: neon-preview-${{ github.event.number }}
+
+jobs:
+  migrate-and-test:
+    if: github.event.action != 'closed' && vars.NEON_PROJECT_ID != '' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - id: neon
+        uses: neondatabase/create-branch-action@v6
+        with:
+          project_id: ${{ vars.NEON_PROJECT_ID }}
+          branch_name: preview/pr-${{ github.event.number }}
+          api_key: ${{ secrets.NEON_API_KEY }}
+      - name: Apply migrations to the preview branch
+        env:
+          DATABASE_URL: ${{ steps.neon.outputs.db_url }}
+        run: npm run db:migrate
+      - name: Database integration tests
+        env:
+          DATABASE_URL: ${{ steps.neon.outputs.db_url_pooled }}
+        run: npm run test:db --if-present
+
+  delete-branch:
+    if: github.event.action == 'closed' && vars.NEON_PROJECT_ID != '' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: neondatabase/delete-branch-action@v3
+        with:
+          project_id: ${{ vars.NEON_PROJECT_ID }}
+          branch: preview/pr-${{ github.event.number }}
+          api_key: ${{ secrets.NEON_API_KEY }}
