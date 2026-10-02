@@ -81,6 +81,16 @@ expect "expo: workflow points at kit repo" grep -q 'alemmle/cursor-quality-kit/.
 expect "switching stack removes stale skills" test ! -e "$repo/.claude/skills/neon-schema-change"
 expect "switching stack removes stale rules" test ! -e "$repo/.cursor/rules/qk-11-neon-postgres.mdc"
 
+repo="$(new_repo own-hooks)"
+mkdir -p "$repo/.githooks"
+printf '#!/bin/sh\nsh scripts/verify.sh --guards-only\n' >"$repo/.githooks/pre-commit"
+expect "own git hook: install warns" bash -c "'$KIT/scripts/install.sh' --stack none '$repo' | grep -q 'pre-commit is the project.s own hook'"
+expect "own git hook: content kept" grep -q 'guards-only' "$repo/.githooks/pre-commit"
+expect "own git hook: missing kit hook still added" grep -q 'cursor-quality-kit' "$repo/.githooks/pre-push"
+"$KIT/scripts/install.sh" --stack none --force "$repo" >/dev/null
+expect "own git hook: --force replaces it" grep -q 'cursor-quality-kit' "$repo/.githooks/pre-commit"
+
+repo="$work/install-expo-eas-neon"
 echo "$((RANDOM)) drift" >>"$repo/.ai/CONSTITUTION.md"
 expect_fail "check-install detects drift" 'constitution differs' "$KIT/scripts/check-install.sh" "$repo"
 

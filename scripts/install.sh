@@ -264,9 +264,14 @@ while IFS= read -r d; do
 done < <(skill_dirs)
 
 echo "Git hooks"
-managed "$KIT_DIR/core/githooks/pre-commit" ".githooks/pre-commit"
-managed "$KIT_DIR/core/githooks/pre-push" ".githooks/pre-push"
-chmod +x "$target/.githooks/pre-commit" "$target/.githooks/pre-push"
+for h in pre-commit pre-push; do
+  if [ -e "$target/.githooks/$h" ] && [ "$force" != "1" ] && ! grep -q 'cursor-quality-kit' "$target/.githooks/$h"; then
+    say warn ".githooks/$h is the project's own hook; kept. Add this line to it: $(sed -n 's/^exec //p' "$KIT_DIR/core/githooks/$h")"
+  else
+    managed "$KIT_DIR/core/githooks/$h" ".githooks/$h"
+    chmod +x "$target/.githooks/$h"
+  fi
+done
 if [ "$hooks" = "1" ] && git -C "$target" rev-parse --git-dir >/dev/null 2>&1; then
   current="$(git -C "$target" config --get core.hooksPath || true)"
   if [ -z "$current" ] || [ "$current" = ".githooks" ]; then
