@@ -1,5 +1,6 @@
 # Reusable: checks that the caller repository has the current AI Code Constitution
-# installed and runs the central (tamper-proof) regression guard on the PR diff.
+# installed, then runs the central (tamper-proof) regression guard and mechanical
+# diff review on the PR diff (acceptance stages 2 and 5).
 name: AI Code Constitution
 
 on:
@@ -17,6 +18,14 @@ on:
         description: Directory where the kit is installed (for monorepos)
         type: string
         default: .
+      max-files:
+        description: Diff review limit on changed files
+        type: number
+        default: 25
+      max-lines:
+        description: Diff review limit on changed lines
+        type: number
+        default: 800
     secrets:
       kit-token:
         description: Token with read access to the kit repository (only needed if it is private)
@@ -57,3 +66,16 @@ jobs:
         run: |
           kit="$GITHUB_WORKSPACE/.quality-kit"
           "$kit/core/bin/guard.sh" --base "origin/$BASE_REF"
+
+      - name: Mechanical diff review
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_REF: ${{ github.base_ref }}
+          DIFF_EXCLUDE: '^\.quality-kit/'
+          DIFF_MAX_FILES: ${{ inputs.max-files }}
+          DIFF_MAX_LINES: ${{ inputs.max-lines }}
+          DIFF_ALLOW_HYGIENE: ${{ contains(github.event.pull_request.labels.*.name, 'ai-hygiene-approved') && '1' || '0' }}
+          DIFF_ALLOW_NO_TESTS: ${{ contains(github.event.pull_request.labels.*.name, 'ai-no-tests-approved') && '1' || '0' }}
+          DIFF_ALLOW_LARGE: ${{ contains(github.event.pull_request.labels.*.name, 'ai-large-diff-approved') && '1' || '0' }}
+        run: |
+          "$GITHUB_WORKSPACE/.quality-kit/core/bin/diff-review.sh" --base "origin/$BASE_REF"

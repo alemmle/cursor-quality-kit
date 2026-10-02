@@ -18,13 +18,17 @@ on:
       coverage:
         type: boolean
         default: false
+      build-ios:
+        description: Also build the iOS simulator app (runs on a macOS runner, which costs more minutes)
+        type: boolean
+        default: false
 
 permissions:
   contents: read
 
 jobs:
   verify:
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.build-ios && 'macos-latest' || 'ubuntu-latest' }}
     defaults:
       run:
         working-directory: ${{ inputs.working-directory }}
@@ -39,3 +43,4 @@ jobs:
         run: ./scripts/verify.sh
         env:
           VERIFY_COVERAGE: ${{ inputs.coverage && '1' || '0' }}
+          VERIFY_BUILD: ${{ inputs.build-ios && '1' || '0' }}
