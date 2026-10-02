@@ -56,17 +56,19 @@ For Flutter use `--stack flutter`; for anything else use `--stack none` and put 
 ## Apply it to all repositories
 
 1. **Make this repository reachable from your other repositories' workflows.** If it is public, nothing to do. If it is private, open this repository's Settings > Actions > General > Access and allow access from repositories owned by you (or your organization).
-2. **Install it in each repository** (example loop; review each PR before merging):
+2. **Roll out to your repositories.** Every repository that uses the kit has a file `rollout/<owner>__<name>.conf` here:
 
-   ```bash
-   for repo in my-ios-app my-flutter-app; do
-     git clone "https://github.com/alemmle/$repo" "/tmp/$repo" && cd "/tmp/$repo"
-     git checkout -b chore/ai-code-constitution
-     ~/cursor-quality-kit/scripts/install.sh --stack expo-eas-neon .   # pick the stack per repo
-     git add -A && git commit -m "chore: install AI Code Constitution" && git push -u origin HEAD
-     cd -
-   done
+   ```text
+   stack=expo-eas-neon
+   options=--skills-dir .agents/skills
+   verify=npm run gate
    ```
+
+   `stack` is required. `options` adds install.sh flags, and `verify` sets the project checks for a new `scripts/verify.sh`.
+
+   `rollout/<owner>__<name>.remove` (optional) lists paths the kit supersedes; they are deleted in the same pull request, so nothing is covered twice. `rollout/<owner>__<name>.md` (optional) is added to the pull request description, for follow-ups that need judgment.
+   The Roll out workflow runs on every new `VERSION` or `rollout/` change on `main`, or by hand under Actions > Roll out. It runs `scripts/rollout.sh`, which clones each repository, deletes the superseded paths, and runs `install.sh`. It then opens a draft pull request from `quality-kit/install`, or refreshes the one already open. Try it without pushing: `scripts/rollout.sh --dry-run alemmle/my-app`.
+   It needs the Actions secret `KIT_BOT_TOKEN`: a fine-grained personal access token with **Contents**, **Pull requests** and **Workflows** read and write on the app repositories, and **Contents** and **Pull requests** read and write on this repository. The same token runs the harvest. A new app needs only a `.conf` file here; merging it opens the install pull request.
 
 3. **Require the checks.** In each repository's branch protection (or a ruleset for all repositories), require the `constitution` and `verify` checks from the "AI quality gate" workflow on `main`.
 4. **Create the override labels** humans use to approve exceptions: `ai-test-deletion-approved`, `ai-gate-change-approved`, `ai-migration-edit-approved`.
@@ -99,11 +101,11 @@ The kit is the shared memory for every app. A lesson learned in one repository r
 1. **In the app**, ask the agent to "make this a rule" (or "remember this"). It follows the `capture-learning` skill: it checks whether the kit already covers the lesson, picks a scope, and writes a normal project rule (`.cursor/rules/<name>.mdc`) or skill (`.claude/skills/<name>/`). The file works in that repository immediately. Generic lessons get one marker line right after the frontmatter: `<!-- quality-kit:propose core -->`, or `<!-- quality-kit:propose stack -->` for the repository's stack. App-specific lessons go to that repository's `AGENTS.md`, without a marker.
 2. **Harvest.** Once a day (or on demand under Actions > Harvest proposals), `harvest.yml` in this repository reads the default branch of every repository of the owner that has `.ai/KIT_VERSION`. It runs `scripts/harvest.sh` and opens one pull request per proposal. A rule lands as `core/cursor-rules/qk-<name>.mdc` or `stacks/<stack>/cursor-rules/qk-<name>.mdc`; a skill lands in `core/skills/<name>/` or `stacks/<stack>/skills/<name>/`. A marker of the form `propose core amends <kit-name>` instead replaces an existing kit rule or skill, and the pull request shows the diff.
 3. **Review.** Generalize the text on the pull request branch, bump `VERSION`, update `CHANGELOG.md`, and merge. To reject a proposal, close its pull request: that exact version is not proposed again, but a changed version is.
-4. **Back down.** Release, then re-run `install.sh` in each repository. It installs the promoted rule or skill everywhere and deletes the app's marked copy, which the kit version now replaces.
+4. **Back down.** Bump `VERSION` and merge; the Roll out workflow opens upgrade pull requests in every repository. It installs the promoted rule or skill everywhere and deletes the app's marked copy, which the kit version now replaces.
 
 Nothing is merged automatically. Whatever reaches the kit is installed in every repository, so review is the only safeguard against app details, unverified claims, or injected instructions spreading.
 
-One-time setup: create a fine-grained personal access token. Give it **Contents: read** on the app repositories and **Contents + Pull requests: read and write** on this repository. Save it as the Actions secret `KIT_HARVEST_TOKEN` here. `GITHUB_TOKEN` cannot read other private repositories, and pull requests opened with it do not start the Self-test workflow.
+Setup: the `KIT_BOT_TOKEN` secret described under "Roll out to your repositories". `GITHUB_TOKEN` cannot read other private repositories, and pull requests opened with it do not start the Self-test workflow.
 
 To try a harvest locally: `scripts/harvest.sh --out /tmp/harvest ../my-app alemmle/other-app` stages each proposal in `/tmp/harvest/<id>/` without touching git.
 
@@ -165,12 +167,14 @@ core/                      installed in every repository
 shared/                    rules, skills, templates reused by several stacks (stack.conf picks them)
 stacks/<stack>/            stack.conf, AGENTS section, Cursor rules, skills, project templates
 .github/workflows/         reusable: constitution.yml, node-quality.yml, flutter-quality.yml;
-                           self-test.yml, release.yml, harvest.yml
+                           self-test.yml, release.yml, harvest.yml, rollout.yml
 scripts/install.sh         install / update a repository
 scripts/check-install.sh   drift check used by CI
 scripts/inventory.sh       report existing AI rules, skills, tests and CI across repositories
 scripts/harvest.sh         collect rules and skills that repositories propose for the kit
 scripts/harvest-pr.sh      open one kit pull request per proposal (used by harvest.yml)
+scripts/rollout.sh         install the kit into every repository in rollout/ (used by rollout.yml)
+rollout/                   per repository: stack and options, superseded paths, PR notes
 tests/run.sh               self-tests for the installer and guard
 ```
 
