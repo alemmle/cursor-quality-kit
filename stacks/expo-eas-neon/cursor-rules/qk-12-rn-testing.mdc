@@ -1,0 +1,17 @@
+---
+description: Testing rules for Expo / React Native (Jest, React Native Testing Library, Maestro)
+globs: "**/*.test.{ts,tsx},**/__tests__/**,.maestro/**,jest.config.*"
+alwaysApply: false
+---
+
+# Testing rules (Expo / React Native)
+
+- Unit/component tests use Jest with the `jest-expo` preset and `@testing-library/react-native`.
+- Check the installed RNTL major version before writing tests. In v14+, `render`, `fireEvent` and `userEvent` calls are async (`await render(...)`) and the `test-renderer` package is a required peer dependency. In v12/v13 `render` is synchronous. Follow the style of existing tests.
+- Query like a user: `getByRole`, `getByLabelText`, `getByText`. Use `getByTestId` only when nothing user-facing exists.
+- Use `userEvent` (or `fireEvent` where `userEvent` does not apply) and `await findBy...` for async UI. No arbitrary `setTimeout` waits.
+- Mock at boundaries: the API client module, `expo-*` native modules, time. Do not mock the component under test or its child components to make a test pass.
+- Each test file covers: the main path, one failure path (network error, validation error, empty data), and every bug that was fixed in that module.
+- Never use `.only`, `.skip`, `xit`, or delete a failing test. Never update snapshots just to go green.
+- Maestro flows (`.maestro/*.yaml`) cover critical iOS journeys. Select elements by `id` (the React Native `testID`) or visible text. Each flow starts with `launchApp` and `clearState: true` so it does not depend on previous runs.
+- Run a single Jest test: `npx jest path/to/file.test.tsx -t "name"`. Run Maestro locally: `maestro test .maestro/`.

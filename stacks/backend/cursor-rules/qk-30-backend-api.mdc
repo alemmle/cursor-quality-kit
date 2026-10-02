@@ -1,0 +1,16 @@
+---
+description: TypeScript backend / API rules (handlers, services, errors, compatibility)
+globs: "src/**/*.ts,api/**/*.ts,server/**/*.ts,routes/**/*.ts"
+alwaysApply: false
+---
+
+# Backend API rules
+
+- Use the framework, router, ORM, validator, and logger already in `package.json`. Never add a second one.
+- Handler shape: authenticate -> authorize resource ownership -> validate input with a schema -> call a service -> map to a response. No SQL or business logic in handlers.
+- One error format for the whole API (for example `{ error: { code, message } }`) with correct HTTP status codes: 400 validation, 401 unauthenticated, 403 forbidden, 404 not found, 409 conflict, 5xx only for real server faults. Never return stack traces or database errors.
+- Response shapes are a contract with shipped mobile apps: add optional fields freely; renaming, removing, or changing the type of a field needs a new version or explicit approval.
+- Outbound HTTP calls have timeouts and handle failure. Writes that clients may retry are idempotent.
+- Lists are paginated with a maximum page size.
+- Secrets and `DATABASE_URL` come from environment variables, validated at startup with a schema; fail fast if missing.
+- Tests for every endpoint you touch: success, validation error, unauthenticated, and access to another user's resource.

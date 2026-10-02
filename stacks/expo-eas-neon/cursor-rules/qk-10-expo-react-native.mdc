@@ -1,0 +1,18 @@
+---
+description: Expo / React Native / iOS implementation rules
+globs: "**/*.{ts,tsx,js,jsx},app.json,app.config.*,eas.json"
+alwaysApply: false
+---
+
+# Expo / React Native rules
+
+- Read `package.json` first and note the `expo`, `react-native`, and `expo-router` versions. Only use APIs that exist in those versions; confirm in `node_modules/<pkg>` types when unsure. Read the docs for the installed SDK (`https://docs.expo.dev/versions/v<SDK>.0.0/`), not `latest` or memory; Expo APIs change between SDKs.
+- Keep business logic (validation, state transitions, formatting, navigation decisions) in modules that import neither `react-native` nor `expo-*`, so plain Node or Jest tests can load them without native mocks. Screens call those modules.
+- Install packages with `npx expo install <pkg>` (dev dependencies: `npx expo install <pkg> --dev`). Never `npm install` a native package directly.
+- Native changes (config plugins, `ios.infoPlist`, entitlements, new native modules) need a new dev build. State that explicitly; do not claim they work in Expo Go or via an OTA update.
+- Do not add a second library for something the project already does (navigation, state, data fetching, styling, forms, icons). Look in `package.json` and existing code first.
+- No `any`, no `@ts-ignore`. Validate untrusted data at the boundary with a schema.
+- Every new screen: loading, empty, and error states; safe areas; keyboard handling for inputs; `accessibilityLabel`/`accessibilityRole` on controls; `testID` on elements used by Maestro flows.
+- Keep components small: data fetching in hooks, presentation in components. Do not put fetch calls directly in JSX trees.
+- Never put secrets or database URLs in `EXPO_PUBLIC_*` variables or in app source.
+- After changes run `./scripts/verify.sh`. For UI changes, also describe how you checked it on the iOS simulator, or say that you did not.

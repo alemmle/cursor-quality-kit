@@ -1,0 +1,8 @@
+# Smoke flow: the app launches cleanly and shows its first screen.
+# Replace the assertion with visible text or a testID from your first screen.
+# Run locally against a simulator build: maestro test .maestro/
+appId: {{IOS_BUNDLE_ID}}
+---
+- launchApp:
+    clearState: true
+- assertVisible: '.+'

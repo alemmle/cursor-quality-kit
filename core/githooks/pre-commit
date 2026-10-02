@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# cursor-quality-kit: block regressions before they are committed.
+set -euo pipefail
+root="$(git rev-parse --show-toplevel)"
+exec "$root/.ai/bin/guard.sh" --staged

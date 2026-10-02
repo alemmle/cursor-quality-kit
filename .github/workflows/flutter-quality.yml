@@ -1,0 +1,46 @@
+# Reusable: runs the Flutter verification gate (scripts/verify.sh) in the caller repository.
+name: Flutter quality gate
+
+on:
+  workflow_call:
+    inputs:
+      flutter-version:
+        description: Exact Flutter version (empty = latest on the channel)
+        type: string
+        default: ''
+      channel:
+        type: string
+        default: stable
+      working-directory:
+        description: Directory containing pubspec.yaml (for monorepos)
+        type: string
+        default: .
+      coverage:
+        type: boolean
+        default: false
+      build-ios:
+        description: Also build the iOS simulator app (runs on a macOS runner, which costs more minutes)
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ${{ inputs.build-ios && 'macos-latest' || 'ubuntu-latest' }}
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ inputs.channel }}
+          flutter-version: ${{ inputs.flutter-version }}
+          cache: true
+      - name: scripts/verify.sh
+        run: ./scripts/verify.sh
+        env:
+          VERIFY_COVERAGE: ${{ inputs.coverage && '1' || '0' }}
+          VERIFY_BUILD: ${{ inputs.build-ios && '1' || '0' }}

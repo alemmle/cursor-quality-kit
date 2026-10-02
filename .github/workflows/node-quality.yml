@@ -1,0 +1,50 @@
+# Reusable: runs scripts/verify.sh for Node-based stacks (Expo / EAS apps and TypeScript backends).
+name: Node quality gate
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        type: string
+        default: '22'
+      working-directory:
+        description: Directory containing package.json (for monorepos)
+        type: string
+        default: .
+      skip-doctor:
+        description: Skip expo-doctor (Expo stack only)
+        type: boolean
+        default: false
+      coverage:
+        description: Run tests with coverage (thresholds come from the test runner config)
+        type: boolean
+        default: false
+      build:
+        description: Run the build stage (Expo - expo export for iOS; backend - npm run build)
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: npm
+          cache-dependency-path: ${{ inputs.working-directory }}/package-lock.json
+      - run: npm ci
+      - name: scripts/verify.sh
+        run: ./scripts/verify.sh
+        env:
+          CI: 'true'
+          VERIFY_SKIP_DOCTOR: ${{ inputs.skip-doctor && '1' || '0' }}
+          VERIFY_COVERAGE: ${{ inputs.coverage && '1' || '0' }}
+          VERIFY_BUILD: ${{ inputs.build && '1' || '0' }}

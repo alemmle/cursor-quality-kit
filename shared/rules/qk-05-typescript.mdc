@@ -1,0 +1,18 @@
+---
+description: TypeScript rules (strictness, types at boundaries, no escape hatches)
+globs: "**/*.{ts,tsx,mts,cts}"
+alwaysApply: false
+---
+
+# TypeScript rules
+
+- `strict: true` stays on in `tsconfig.json` (the gate checks it). Do not loosen compiler options to get green.
+- No `any`. Use precise types, generics, or `unknown` followed by validation/narrowing.
+- No `@ts-ignore` / `@ts-nocheck`. `@ts-expect-error` only with a reason and `// ai-guard: allow <reason>`.
+- Avoid non-null assertions (`value!`) and unchecked casts (`as Foo`) on data you have not validated. Narrow instead.
+- External data (HTTP, storage, env vars, deep links) is `unknown` until parsed with a schema (for example Zod); derive the static type from the schema (`z.infer<typeof Schema>`) instead of writing it twice.
+- Model states explicitly with discriminated unions (`{ status: 'loading' } | { status: 'error'; error: E } | { status: 'ok'; data: T }`), not loose optional fields.
+- In `switch` over a union or enum, handle every case and add a `never` check in `default` so new variants fail to compile.
+- Prefer `type`/`interface` exports from one place; do not redefine the same shape in several files.
+- Async: every promise is awaited, returned, or explicitly `void`-ed with a reason. No floating promises.
+- Keep functions small and typed at the boundary (explicit return types on exported functions).

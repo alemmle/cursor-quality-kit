@@ -1,0 +1,16 @@
+---
+description: Neon Postgres, migrations, and API route rules
+globs: "**/*+api.ts,**/server/**,**/db/**,**/drizzle/**,**/migrations/**,**/prisma/**,drizzle.config.*"
+alwaysApply: false
+---
+
+# Neon Postgres rules
+
+- Database access happens only in server code (Expo Router `+api.ts` routes, EAS Hosting, or a separate backend). Never import a database driver into app/client code.
+- Read the connection string from `process.env.DATABASE_URL`. Never hard-code it, log it, or expose it through `EXPO_PUBLIC_*`.
+- Use the ORM and driver already in `package.json` (for example `drizzle-orm` with `@neondatabase/serverless`). Do not add a second ORM.
+- Every API route: authenticate, authorize the specific resource, validate the request body/query with a schema, and return typed errors. Never trust IDs from the client without an ownership check.
+- Schema changes: edit the schema, generate a new migration with the project's tool (`npx drizzle-kit generate` or `npx prisma migrate dev --name <name>`), review the SQL, commit it. Never edit or delete an already-applied migration file.
+- Destructive SQL (DROP, column removal, data rewrites) requires explicit human approval in the current task. Prefer expand-then-contract: add the new column, backfill, switch code, remove later.
+- Never run migrations or queries against the production branch. Use a Neon dev branch locally and the per-PR branch in CI.
+- Keep queries in a small repository module so API route tests can replace it without a database.

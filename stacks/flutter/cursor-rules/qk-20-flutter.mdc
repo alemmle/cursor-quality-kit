@@ -1,0 +1,17 @@
+---
+description: Flutter / Dart implementation and testing rules
+globs: "**/*.dart,pubspec.yaml,analysis_options.yaml"
+alwaysApply: false
+---
+
+# Flutter rules
+
+- Read `pubspec.yaml` and `pubspec.lock` first. Only use APIs that exist in the resolved versions; when unsure, open the package source in the pub cache.
+- Add packages with `flutter pub add`. Do not add a second state management, routing, HTTP, or DI library.
+- No `dynamic` for external data; parse into typed models. No `// ignore:` or `// ignore_for_file:` to silence the analyzer.
+- Keep logic out of widgets so it can be unit tested. Prefer `const` widgets.
+- Every screen: loading, empty, and error states; `SafeArea`; text scaling; `Semantics`; `Key`s for elements used in integration tests.
+- Prove text scaling and tap targets in widget tests: pump each screen under `MediaQuery` with `textScaler: TextScaler.linear(2.0)` (an overflow fails the test), then `await expectLater(tester, meetsGuideline(iOSTapTargetGuideline))` and `meetsGuideline(labeledTapTargetGuideline)`.
+- Tests: unit tests for logic, `testWidgets` for UI, `integration_test/` for critical flows. Use `pumpAndSettle` or explicit pumps, never real `Future.delayed` waits.
+- Never use `skip:`, `solo:`, or delete a failing test. Never regenerate goldens just to go green.
+- Run a single test: `flutter test test/path_test.dart --plain-name "name"`. Full gate: `./scripts/verify.sh`.

@@ -1,0 +1,17 @@
+---
+description: Security rules for every change (secrets, auth, input validation, mobile binaries)
+alwaysApply: true
+---
+
+# Security rules
+
+- Never commit secrets, API keys, tokens, private keys, or connection strings with passwords. Read them from environment variables; keep `.env` files git-ignored and provide `.env.example` with placeholder values.
+- Everything in a mobile app binary or web bundle is public: `EXPO_PUBLIC_*`, `--dart-define` values, assets, JS bundles. No privileged keys or database credentials there.
+- Every server endpoint authenticates the caller and authorizes access to the specific resource (ownership check), not just "is logged in".
+- Validate all input crossing a trust boundary (request bodies, query params, headers, deep links, push payloads, storage, third-party responses) with a schema. Reject unknown or malformed data.
+- Use parameterized queries or the ORM's query builder. Never build SQL by string concatenation with user input.
+- Store tokens on device with secure storage (`expo-secure-store`, Keychain via `flutter_secure_storage`), not AsyncStorage or SharedPreferences.
+- Do not log secrets, tokens, passwords, full request bodies with personal data, or connection strings.
+- Do not weaken security settings (CORS `*`, disabled TLS verification, `NSAllowsArbitraryLoads`, broad permissions) to make something work. If it seems required, stop and ask.
+- New dependencies: prefer well-maintained packages; mention any package with install scripts or native code in your report.
+- Authentication, payments, data deletion, and permission changes always need human review (Constitution Article 12).

@@ -1,0 +1,23 @@
+# Builds an iOS simulator app with the `e2e-test` profile and runs the Maestro flows on EAS.
+# Requires this profile in eas.json:
+#   "e2e-test": { "withoutCredentials": true, "ios": { "simulator": true } }
+# Docs: https://docs.expo.dev/eas/workflows/examples/e2e-tests/
+name: e2e-test-ios
+
+on:
+  pull_request:
+    branches: ['*']
+
+jobs:
+  build_ios_for_e2e:
+    type: build
+    params:
+      platform: ios
+      profile: e2e-test
+
+  maestro_test:
+    needs: [build_ios_for_e2e]
+    type: maestro
+    params:
+      build_id: ${{ needs.build_ios_for_e2e.outputs.build_id }}
+      flow_path: ['.maestro/smoke.yml']
