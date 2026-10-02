@@ -257,6 +257,40 @@ expect "inventory: lists relevant packages only" bash -c "grep -q 'expo@~57.0.0 
 expect "inventory: copies instruction files" test -f "$work/inv/files/inv-app/.cursor/rules/rn.mdc"
 expect "inventory: finds Cursor project skills" test -f "$work/inv/files/inv-app/.cursor/skills/handover/SKILL.md"
 
+echo "harvest"
+app="$(new_repo harvest-app)"
+"$KIT/scripts/install.sh" --stack expo-eas-neon "$app" >/dev/null
+fm() { printf -- '---\ndescription: %s\n---\n' "$1"; }
+{ fm 'No sheets'; echo '<!-- quality-kit:propose stack -->'; echo 'Use a modal route.'; } >"$app/.cursor/rules/no-sheets.mdc"
+{ fm 'Local'; echo 'App only.'; } >"$app/.cursor/rules/local-only.mdc"
+{ fm 'Kit'; echo '<!-- quality-kit:propose core -->'; } >"$app/.cursor/rules/qk-99-fake.mdc"
+{ fm 'Testing'; echo '<!-- quality-kit:propose core amends qk-03-testing -->'; echo 'Amended.'; } >"$app/.cursor/rules/amend-qk-03-testing.mdc"
+{ fm 'Bad'; echo '<!-- quality-kit:propose core amends qk-77-missing -->'; } >"$app/.cursor/rules/bad-amend.mdc"
+mkdir -p "$app/.cursor/skills/evidence/references"
+{ printf -- '---\nname: evidence\ndescription: Report evidence.\n---\n'; echo '<!-- quality-kit:propose core -->'; echo 'Steps.'; } >"$app/.cursor/skills/evidence/SKILL.md"
+echo 'Notes.' >"$app/.cursor/skills/evidence/references/notes.md"
+commit_all "$app" "proposals"
+"$KIT/scripts/harvest.sh" --out "$work/h" "$app" >"$work/h.out" 2>&1 || true
+h="$work/h"
+expect "harvest: three proposals staged" test "$(find "$h" -name meta | wc -l | tr -d ' ')" = 3
+expect "harvest: stack rule lands in the stack" test -f "$(echo "$h"/*/files/stacks/expo-eas-neon/cursor-rules/qk-no-sheets.mdc)"
+expect "harvest: marker removed" bash -c "! grep -rq 'quality-kit:propose' '$h' --include='*.mdc' --include=SKILL.md"
+expect "harvest: skill copied with references" test -f "$(echo "$h"/*/files/core/skills/evidence/references/notes.md)"
+expect "harvest: amendment targets the kit rule" grep -qx 'action=update' "$(grep -l 'dest=core/cursor-rules/qk-03-testing.mdc' "$h"/*/meta)"
+expect "harvest: unknown amendment target reported" grep -q 'qk-77-missing' "$work/h.out"
+expect "harvest: unmarked, kit-managed and installed kit skills ignored" bash -c "! grep -qE 'local-only|qk-99|capture-learning' '$work/h.out'"
+
+kit2="$work/kit2"
+cp -R "$KIT" "$kit2"
+for f in "$h"/*/files; do cp -R "$f/." "$kit2/"; done
+"$KIT/scripts/harvest.sh" --out "$work/h2" --kit "$kit2" "$app" >/dev/null 2>&1 || true
+expect "harvest: proposals already in the kit are skipped" test -z "$(find "$work/h2" -name meta)"
+expect "install: promoted proposals reported" bash -c "'$kit2/scripts/install.sh' --stack expo-eas-neon '$app' >'$work/promote.out'"
+expect "install: promoted rule replaces the app copy" bash -c "test -f '$app/.cursor/rules/qk-no-sheets.mdc' && test ! -e '$app/.cursor/rules/no-sheets.mdc'"
+expect "install: promoted skill replaces the app copy" bash -c "test -f '$app/.claude/skills/evidence/references/notes.md' && test ! -e '$app/.cursor/skills/evidence'"
+expect "install: pending amendment kept and listed" bash -c "test -f '$app/.cursor/rules/amend-qk-03-testing.mdc' && grep -q 'pending .*amend-qk-03-testing' '$work/promote.out'"
+expect "install: unmarked project rule kept" test -f "$app/.cursor/rules/local-only.mdc"
+
 echo "versioning"
 v="$(tr -d '[:space:]' <"$KIT/VERSION")"
 expect "VERSION matches CONSTITUTION.md" grep -qx "Version: $v" "$KIT/CONSTITUTION.md"
