@@ -216,7 +216,7 @@ echo "cursor-quality-kit $VERSION -> $target (stack: $stack)"
 echo "Constitution, acceptance criteria and gate scripts"
 managed "$KIT_DIR/CONSTITUTION.md" ".ai/CONSTITUTION.md"
 managed "$KIT_DIR/core/ACCEPTANCE.md" ".ai/ACCEPTANCE.md"
-for b in guard.sh diff-review.sh accept.sh; do
+for b in guard.sh diff-review.sh accept.sh agent-hook.sh; do
   managed "$KIT_DIR/core/bin/$b" ".ai/bin/$b"
   chmod +x "$target/.ai/bin/$b"
 done
@@ -276,6 +276,16 @@ if [ "$hooks" = "1" ] && git -C "$target" rev-parse --git-dir >/dev/null 2>&1; t
     say warn "core.hooksPath is '$current' (husky/lefthook?). Call .ai/bin/guard.sh --staged from your pre-commit hook and scripts/verify.sh from pre-push."
   fi
 fi
+
+echo "Agent hooks (Cursor, Claude Code, Codex): gate before the agent may finish"
+for pair in "cursor-hooks.json:.cursor/hooks.json" "claude-settings.json:.claude/settings.json" "codex-hooks.json:.codex/hooks.json"; do
+  src="$KIT_DIR/core/templates/agent-hooks/${pair%%:*}" dest="${pair#*:}"
+  if [ -e "$target/$dest" ] && [ "$force" != "1" ] && ! grep -q 'agent-hook[.]sh' "$target/$dest"; then
+    say warn "$dest exists without the kit hooks. Merge the entries from $src into it."
+  else
+    template "$src" "$dest"
+  fi
+done
 
 echo "Project templates"
 template "$KIT_DIR/core/templates/PROJECT_STATE.md" "docs/PROJECT_STATE.md"

@@ -135,7 +135,7 @@ if [ "${GUARD_ALLOW_TEST_DELETION:-0}" != "1" ]; then
 fi
 
 if [ "${GUARD_ALLOW_GATE_CHANGES:-0}" != "1" ]; then
-  gate="$(names_matching MD '^(scripts/verify[.]sh|[.]ai/|[.]githooks/|[.]github/workflows/)')"
+  gate="$(names_matching MD '^(scripts/verify[.]sh|[.]ai/|[.]githooks/|[.]github/workflows/|[.]cursor/hooks[.]json$|[.]claude/settings[.]json$|[.]codex/hooks[.]json$)')"
   [ -n "$gate" ] && report "Verification gate, hooks or CI modified. A human must approve (GUARD_ALLOW_GATE_CHANGES=1 or the 'ai-gate-change-approved' PR label)." "$gate"
 fi
 

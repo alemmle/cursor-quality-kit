@@ -140,6 +140,10 @@ expect_fail "blocks gate edits" 'Verification gate' g .ai/bin/guard.sh --staged
 expect "gate edit override" g env GUARD_ALLOW_GATE_CHANGES=1 .ai/bin/guard.sh --staged
 git -C "$repo" reset -q --hard
 
+printf '{}\n' >"$repo/.cursor/hooks.json"; git -C "$repo" add -A
+expect_fail "blocks agent hook config edits" 'Verification gate' g .ai/bin/guard.sh --staged
+git -C "$repo" reset -q --hard
+
 printf 'DROP TABLE t;\n' >>"$repo/drizzle/0000_init.sql"; git -C "$repo" add -A
 expect_fail "blocks editing applied migration" 'Existing migration' g .ai/bin/guard.sh --staged
 git -C "$repo" reset -q --hard
@@ -189,6 +193,42 @@ expect "diff-review: docs always in scope" bash -c "printf 'x\n' >>'$repo/AGENTS
 expect "accept: ACCEPT when all stages pass" bash -c "cd '$repo' && .ai/bin/accept.sh --base main | tail -1 | grep -qx ACCEPT"
 printf "it.only('x', () => {});\n" >>"$repo/src/cart/a.test.ts"
 expect_fail "accept: REJECT when the guard fails" '^REJECT$' bash -c "cd '$repo' && .ai/bin/accept.sh --base main"
+
+echo "agent hooks"
+repo="$(new_repo agent-hook)"
+"$KIT/scripts/install.sh" --stack none "$repo" >/dev/null
+for f in .cursor/hooks.json .claude/settings.json .codex/hooks.json; do
+  expect "hooks: $f installed" grep -q 'agent-hook[.]sh' "$repo/$f"
+  if command -v node >/dev/null 2>&1; then expect "hooks: $f is valid JSON" node -e 'JSON.parse(require("fs").readFileSync(process.argv[1], "utf8"))' "$repo/$f"; fi
+done
+printf '#!/usr/bin/env bash\n[ ! -f broken ] || { echo "1 test failed"; exit 1; }\n' >"$repo/scripts/verify.sh"
+commit_all "$repo" "baseline"
+hook() { # hook <payload> <args...>
+  local p="$1"; shift
+  (cd "$repo" && printf '%s' "$p" | .ai/bin/agent-hook.sh "$@")
+}
+shell_cmd() { printf '{"command":"%s","cursor_version":"3"}' "$1"; }
+for c in 'git commit --no-verify -m x' 'GUARD_ALLOW_GATE_CHANGES=1 git commit -m x' 'git config core.hooksPath /dev/null' \
+  'git push --force origin main' 'git push origin +main' 'npx eas submit -p ios' 'eas update --branch production' 'neonctl branches delete dev'; do
+  expect_fail "pre-shell blocks: $c" 'Blocked by' hook "$(shell_cmd "$c")" pre-shell
+done
+for c in 'git push -u origin feature' 'npm test' 'eas update --branch preview' 'git commit -m "fix: x"'; do
+  expect "pre-shell allows: $c" hook "$(shell_cmd "$c")" pre-shell
+done
+expect "pre-shell: claude format skips Cursor payloads (no double run)" hook "$(shell_cmd 'git commit --no-verify')" pre-shell --format claude
+expect_fail "pre-shell: claude format blocks Claude payloads" 'Blocked by' hook '{"tool_input":{"command":"git commit --no-verify"}}' pre-shell --format claude
+
+expect "stop: clean tree allows" bash -c "test \"\$(cd '$repo' && echo '{}' | .ai/bin/agent-hook.sh stop)\" = '{}'"
+touch "$repo/broken"
+expect "stop: failing gate blocks (cursor)" bash -c "cd '$repo' && echo '{}' | .ai/bin/agent-hook.sh stop | grep -q '\"followup_message\":.*1 test failed'"
+expect "stop: failing gate blocks (claude/codex)" bash -c "cd '$repo' && echo '{}' | .ai/bin/agent-hook.sh stop --format claude | grep -q '\"decision\":\"block\"'"
+expect "stop: user abort is not blocked" bash -c "test \"\$(cd '$repo' && echo '{\"status\":\"aborted\"}' | .ai/bin/agent-hook.sh stop)\" = '{}'"
+expect "stop: gives up after AI_HOOK_STOP_MAX failures" bash -c "test \"\$(cd '$repo' && echo '{}' | .ai/bin/agent-hook.sh stop)\" = '{}'"
+rm "$repo/broken"; printf 'x\n' >"$repo/new.txt"
+expect "stop: green gate allows" bash -c "test \"\$(cd '$repo' && echo '{}' | .ai/bin/agent-hook.sh stop)\" = '{}'"
+expect "stop: green result cached" test -s "$(git -C "$repo" rev-parse --absolute-git-dir)/ai-hook/green"
+printf '{}\n' >"$repo/.cursor/hooks.json"
+expect_fail "check-install: missing agent hooks fail" 'does not run .ai/bin/agent-hook.sh' "$KIT/scripts/check-install.sh" "$repo"
 
 echo "versioning"
 v="$(tr -d '[:space:]' <"$KIT/VERSION")"

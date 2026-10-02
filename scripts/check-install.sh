@@ -27,7 +27,14 @@ same "$KIT_DIR/core/ACCEPTANCE.md" ".ai/ACCEPTANCE.md" "acceptance criteria"
 same "$KIT_DIR/core/bin/guard.sh" ".ai/bin/guard.sh" "regression guard"
 same "$KIT_DIR/core/bin/diff-review.sh" ".ai/bin/diff-review.sh" "diff review"
 same "$KIT_DIR/core/bin/accept.sh" ".ai/bin/accept.sh" "acceptance pipeline"
+same "$KIT_DIR/core/bin/agent-hook.sh" ".ai/bin/agent-hook.sh" "agent hook"
 same "$KIT_DIR/core/cursor-rules/qk-00-constitution.mdc" ".cursor/rules/qk-00-constitution.mdc" "cursor rule"
+
+for f in .cursor/hooks.json .claude/settings.json .codex/hooks.json; do
+  if [ -f "$f" ] && grep -q 'agent-hook[.]sh[^a-z]* pre-shell' "$f" && grep -q 'agent-hook[.]sh[^a-z]* stop' "$f"; then pass "$f runs the agent hooks"
+  else fail "$f does not run .ai/bin/agent-hook.sh (pre-shell and stop). Re-run install.sh or merge the kit entries."
+  fi
+done
 
 for f in AGENTS.md CLAUDE.md; do
   if [ -f "$f" ] && grep -qF '<!-- quality-kit:begin -->' "$f"; then pass "$f managed block"

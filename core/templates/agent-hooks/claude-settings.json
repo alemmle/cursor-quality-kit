@@ -1,0 +1,19 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "\"${CLAUDE_PROJECT_DIR}\"/.ai/bin/agent-hook.sh pre-shell --format claude", "timeout": 10 }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          { "type": "command", "command": "\"${CLAUDE_PROJECT_DIR}\"/.ai/bin/agent-hook.sh stop --format claude", "timeout": 900 }
+        ]
+      }
+    ]
+  }
+}
