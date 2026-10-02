@@ -7,6 +7,7 @@ Central repository for the AI Code Constitution (version in `VERSION`) and the r
 ## Status
 
 - Constitution v1.2.0 (see `CHANGELOG.md`): acceptance pipeline (`.ai/bin/accept.sh`, `.ai/bin/diff-review.sh`) and agent hooks (`.ai/bin/agent-hook.sh` for Cursor, Claude Code, Codex). Research behind it: `docs/RESEARCH.md`.
+- Reconciliation with the owner's app repositories is pending: they are private and the agent token only covers this repository. `scripts/inventory.sh` produces the report to reconcile from once access exists.
 - Agent hooks are covered by self-tests with recorded payload shapes. Not yet verified inside a running Cursor, Claude Code, or Codex session.
 - Stacks: `expo-eas-neon`, `flutter`, `backend`, `none`.
 - Verified end to end on 2026-10-02:

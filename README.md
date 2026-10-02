@@ -73,6 +73,25 @@ For Flutter use `--stack flutter`; for anything else use `--stack none` and put 
 5. **Pin a version.** Tag releases here (the `release` workflow tags `vX.Y.Z` from `VERSION` and moves `vX`) and install with `--kit-ref v1` so a change to the kit cannot break every repository at once.
 6. **Global fallback in Cursor.** For repositories that do not have the kit yet, paste the hard rules from [CONSTITUTION.md](CONSTITUTION.md) into Cursor Settings > Rules (user rules), or into team rules in the Cursor dashboard if you are on a team plan.
 
+### Reconcile what your repositories already have
+
+Before installing, collect the rules, skills, and test setups that already exist, so nothing useful is lost and nothing is duplicated:
+
+```bash
+gh auth login        # private repositories need git access
+~/cursor-quality-kit/scripts/inventory.sh --out /tmp/inventory alemmle/my-ios-app alemmle/my-flutter-app ../local-app
+```
+
+`/tmp/inventory/REPORT.md` lists, per repository, the stack, Neon use, every AI instruction file (`AGENTS.md`, `CLAUDE.md`, `.cursorrules`, `.cursor/rules`, `.claude/`, Copilot, Windsurf, Cline, Codex, Spec Kit, ...), tests, lint, hooks, CI, and the relevant package versions. `files/<repo>/` holds copies for comparison. Sort each rule into one of three places:
+
+| The rule is... | Goes to |
+| --- | --- |
+| True for every repository and tool | This kit: `CONSTITUTION.md` or a `core/` rule or skill |
+| True for every app on one stack (Expo, Flutter) | This kit: `stacks/<stack>/` |
+| About one app (its domain, screens, API, quirks) | That repository's `AGENTS.md`, outside the managed block |
+
+Delete what the kit already covers, and move legacy `.cursorrules` content into `AGENTS.md` or `.cursor/rules/*.mdc`.
+
 ### Updating
 
 Change `CONSTITUTION.md`, rules, or skills here, bump `VERSION`, tag a release, then re-run `install.sh` in each repository. The constitution check in CI fails in any repository whose `.ai/` files have drifted from the kit version it points at, so nothing silently falls behind. Upgrades modify protected gate files; commit them with `GUARD_ALLOW_GATE_CHANGES=1` and add the `ai-gate-change-approved` label to the PR.
@@ -133,6 +152,7 @@ stacks/<stack>/            stack.conf, AGENTS section, Cursor rules, skills, pro
                            self-test.yml, release.yml
 scripts/install.sh         install / update a repository
 scripts/check-install.sh   drift check used by CI
+scripts/inventory.sh       report existing AI rules, skills, tests and CI across repositories
 tests/run.sh               self-tests for the installer and guard
 ```
 

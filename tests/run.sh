@@ -230,6 +230,20 @@ expect "stop: green result cached" test -s "$(git -C "$repo" rev-parse --absolut
 printf '{}\n' >"$repo/.cursor/hooks.json"
 expect_fail "check-install: missing agent hooks fail" 'does not run .ai/bin/agent-hook.sh' "$KIT/scripts/check-install.sh" "$repo"
 
+echo "inventory"
+repo="$(new_repo inv-app)"
+mkdir -p "$repo/.cursor/rules" "$repo/src"
+printf 'Use expo-router.\n' >"$repo/.cursorrules"
+printf -- '---\ndescription: RN styling\n---\n' >"$repo/.cursor/rules/rn.mdc"
+printf '{\n "dependencies": {\n  "expo": "~57.0.0",\n  "@neondatabase/serverless": "^1.0.0",\n  "lodash": "4"\n }\n}\n' >"$repo/package.json"
+printf '{"expo":{}}\n' >"$repo/app.json"
+: >"$repo/src/a.test.tsx"
+git -C "$repo" add -A
+expect "inventory: runs" "$KIT/scripts/inventory.sh" --out "$work/inv" "$repo"
+expect "inventory: detects expo + neon" grep -q '| inv-app | expo | yes | 2 | 1 | 0 | no |' "$work/inv/REPORT.md"
+expect "inventory: lists relevant packages only" bash -c "grep -q 'expo@~57.0.0 @neondatabase/serverless@' '$work/inv/REPORT.md' && ! grep -q lodash '$work/inv/REPORT.md'"
+expect "inventory: copies instruction files" test -f "$work/inv/files/inv-app/.cursor/rules/rn.mdc"
+
 echo "versioning"
 v="$(tr -d '[:space:]' <"$KIT/VERSION")"
 expect "VERSION matches CONSTITUTION.md" grep -qx "Version: $v" "$KIT/CONSTITUTION.md"
