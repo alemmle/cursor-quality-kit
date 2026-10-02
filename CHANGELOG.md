@@ -2,6 +2,15 @@
 
 Versioning policy: [docs/VERSIONING.md](docs/VERSIONING.md).
 
+## 1.4.0
+
+Learnings flow back into the kit.
+
+- New core skill `capture-learning`: turn a lesson into a rule, skill or `AGENTS.md` entry, check the kit does not already cover it, and mark generic ones with `<!-- quality-kit:propose core|stack -->` (or `... amends <kit-name>` to replace a kit file).
+- `scripts/harvest.sh` collects marked rules and skills from repositories. `scripts/harvest-pr.sh` and the scheduled `harvest.yml` open one kit pull request per proposal. Needs the `KIT_HARVEST_TOKEN` secret.
+- Installer: deletes an app's marked rule or skill once the kit ships it, and lists proposals that are still pending.
+- The managed `AGENTS.md` block points agents to `capture-learning`.
+
 ## 1.3.0
 
 Rules reconciled from the owner's app repositories (`docs/RECONCILIATION.md`). Like 1.2.0, this ships before any tag exists, so the new guard pattern is a minor bump; after the first tagged release it would be major.

@@ -92,6 +92,21 @@ gh auth login        # private repositories need git access
 
 Delete what the kit already covers, and move legacy `.cursorrules` content into `AGENTS.md` or `.cursor/rules/*.mdc`.
 
+### Learnings flow back into the kit
+
+The kit is the shared memory for every app. A lesson learned in one repository reaches the others like this:
+
+1. **In the app**, ask the agent to "make this a rule" (or "remember this"). It follows the `capture-learning` skill: it checks whether the kit already covers the lesson, picks a scope, and writes a normal project rule (`.cursor/rules/<name>.mdc`) or skill (`.claude/skills/<name>/`). The file works in that repository immediately. Generic lessons get one marker line right after the frontmatter: `<!-- quality-kit:propose core -->`, or `<!-- quality-kit:propose stack -->` for the repository's stack. App-specific lessons go to that repository's `AGENTS.md`, without a marker.
+2. **Harvest.** Once a day (or on demand under Actions > Harvest proposals), `harvest.yml` in this repository reads the default branch of every repository of the owner that has `.ai/KIT_VERSION`. It runs `scripts/harvest.sh` and opens one pull request per proposal. A rule lands as `core/cursor-rules/qk-<name>.mdc` or `stacks/<stack>/cursor-rules/qk-<name>.mdc`; a skill lands in `core/skills/<name>/` or `stacks/<stack>/skills/<name>/`. A marker of the form `propose core amends <kit-name>` instead replaces an existing kit rule or skill, and the pull request shows the diff.
+3. **Review.** Generalize the text on the pull request branch, bump `VERSION`, update `CHANGELOG.md`, and merge. To reject a proposal, close its pull request: that exact version is not proposed again, but a changed version is.
+4. **Back down.** Release, then re-run `install.sh` in each repository. It installs the promoted rule or skill everywhere and deletes the app's marked copy, which the kit version now replaces.
+
+Nothing is merged automatically. Whatever reaches the kit is installed in every repository, so review is the only safeguard against app details, unverified claims, or injected instructions spreading.
+
+One-time setup: create a fine-grained personal access token. Give it **Contents: read** on the app repositories and **Contents + Pull requests: read and write** on this repository. Save it as the Actions secret `KIT_HARVEST_TOKEN` here. `GITHUB_TOKEN` cannot read other private repositories, and pull requests opened with it do not start the Self-test workflow.
+
+To try a harvest locally: `scripts/harvest.sh --out /tmp/harvest ../my-app alemmle/other-app` stages each proposal in `/tmp/harvest/<id>/` without touching git.
+
 ### Updating
 
 Change `CONSTITUTION.md`, rules, or skills here, bump `VERSION`, tag a release, then re-run `install.sh` in each repository. The constitution check in CI fails in any repository whose `.ai/` files have drifted from the kit version it points at, so nothing silently falls behind. Upgrades modify protected gate files; commit them with `GUARD_ALLOW_GATE_CHANGES=1` and add the `ai-gate-change-approved` label to the PR.
@@ -144,15 +159,18 @@ core/                      installed in every repository
   cursor-rules/            constitution (always on), scope, security, testing, CI workflows
   githooks/                pre-commit, pre-push
   skills/                  plan-small-change, fix-bug-with-regression-test, verify-before-done,
-                           debugging-protocol, code-review, ai-regression-protocol, orchestrate-workers
+                           debugging-protocol, code-review, ai-regression-protocol, orchestrate-workers,
+                           capture-learning
   templates/               PROJECT_STATE.md, PR template, generic verify.sh and workflow, agent-hooks/
 shared/                    rules, skills, templates reused by several stacks (stack.conf picks them)
 stacks/<stack>/            stack.conf, AGENTS section, Cursor rules, skills, project templates
 .github/workflows/         reusable: constitution.yml, node-quality.yml, flutter-quality.yml;
-                           self-test.yml, release.yml
+                           self-test.yml, release.yml, harvest.yml
 scripts/install.sh         install / update a repository
 scripts/check-install.sh   drift check used by CI
 scripts/inventory.sh       report existing AI rules, skills, tests and CI across repositories
+scripts/harvest.sh         collect rules and skills that repositories propose for the kit
+scripts/harvest-pr.sh      open one kit pull request per proposal (used by harvest.yml)
 tests/run.sh               self-tests for the installer and guard
 ```
 
