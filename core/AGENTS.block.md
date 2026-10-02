@@ -8,7 +8,8 @@ This repository follows the AI Code Constitution in `.ai/CONSTITUTION.md` and th
 4. Never use an API, flag, or config key you have not confirmed exists in the installed version.
 5. Bug fix: failing regression test first, then the fix. Feature: tests for the main path and one failure path.
 6. Never delete, skip, focus, or weaken tests, and never add `@ts-ignore` / `eslint-disable` / `// ignore:` / `any` to get green.
-7. Done means `./scripts/verify.sh` exits 0 and you report the real output. Never use `--no-verify`.
+7. Done means `./scripts/verify.sh` exits 0 and you report the real output. Never use `--no-verify`. In Cursor, Claude Code and Codex, `.ai/bin/agent-hook.sh` reruns the gate when you try to finish and sends you back if it fails; never edit or disable the hook configs.
+   Never special-case test inputs to get green. If a test contradicts the task, stop and say so.
 8. No secrets in code. Nothing privileged in the mobile binary.
 9. Before review, `.ai/bin/accept.sh` must print ACCEPT. Report what changed, what you verified (commands + results), and what you did not verify.
 

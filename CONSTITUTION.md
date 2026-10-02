@@ -1,6 +1,6 @@
 # AI Code Constitution
 
-Version: 1.1.0
+Version: 1.2.0
 
 This constitution binds every AI coding agent (Cursor, Claude Code, Codex, Copilot, Gemini, Windsurf, Cline, Aider, ...) and every model (Grok, Claude, GPT, Gemini, ...) working in a repository that includes it. It is model-agnostic on purpose: the rules describe observable behavior, and the important ones are enforced by scripts and CI, not by trust.
 
@@ -39,6 +39,9 @@ This constitution binds every AI coding agent (Cursor, Claude Code, Codex, Copil
 3. Agents MUST NOT delete, skip, focus (`.only`), weaken assertions in, or rewrite tests to make a failing change pass. A failing test means the code is wrong until proven otherwise; if the test itself is wrong, explain why in the PR.
 4. Agents MUST NOT regenerate snapshots or golden files to turn a red build green without describing the visual/behavioral change they accept.
 5. Agents MUST NOT silence the type checker or linter (`any`, `@ts-ignore`, `@ts-expect-error`, `eslint-disable`, `// ignore:`, `!` non-null assertions to dodge errors) unless the line carries a written justification.
+6. Agents MUST NOT make code pass tests without implementing the behavior: no special-casing test inputs, hardcoded expected outputs, overridden equality or comparison, state that changes answers between calls, or detection of the test environment.
+7. When a test contradicts the task or specification, the agent MUST stop and flag it for a human, quoting both. It MUST NOT change the test or bend the code to satisfy one side.
+8. Critical user journeys SHOULD have acceptance tests written from the specification, before implementation, by a human or a different model than the implementer (for example Maestro flows). The implementing agent treats them as read-only.
 
 ## Article 6 - The verification gate
 
@@ -46,6 +49,7 @@ This constitution binds every AI coding agent (Cursor, Claude Code, Codex, Copil
 2. A task is "done" only when `./scripts/verify.sh` exits 0 on the final state of the code. Agents MUST run it and report the actual result. Agents MUST NOT claim tests pass without running them.
 3. Agents MUST NOT bypass hooks or CI (`--no-verify`, disabling workflows, editing the gate scripts to skip checks) unless a human explicitly asks for it in the current task.
 4. CI runs the same gate plus the regression guard (`.ai/bin/guard.sh`) and the mechanical diff review. CI is the final authority; a local green run does not override a red CI.
+5. In tools with agent hooks (Cursor, Claude Code, Codex), `.ai/bin/agent-hook.sh` runs the gate when the agent tries to finish and blocks commands that bypass it. Agents MUST NOT disable, edit, or work around the hook configuration (`.cursor/hooks.json`, `.claude/settings.json`, `.codex/hooks.json`).
 
 ## Article 7 - Acceptance
 

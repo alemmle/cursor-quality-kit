@@ -11,5 +11,8 @@ alwaysApply: true
 - Mock only at boundaries you do not own: network, database driver, native modules, clock, randomness. Never mock the unit under test.
 - Tests are deterministic: no real network, no sleeps/timeouts as synchronization, fixed time and seeds.
 - Never skip, focus, delete, or weaken a test to make a change pass. Never regenerate snapshots or goldens without describing the accepted change.
+- Never make tests pass without implementing the behavior: no branching on test inputs, hardcoded expected values, overridden `==`/`equals`, call counters that change answers, or checks for `NODE_ENV === 'test'` / `kDebugMode` in production code.
+- If a test contradicts the task, stop and quote both to the user. Do not edit the test or bend the code to fit.
+- Acceptance tests marked as written from the spec (for example `.maestro/` flows prepared before the task) are read-only for the implementing agent.
 - Keep the pyramid: many unit tests, fewer component/widget/API tests, a few E2E flows for critical journeys.
 - Run the narrowest test first while iterating, then the full gate (`./scripts/verify.sh`) before reporting done.
