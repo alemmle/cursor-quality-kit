@@ -1,0 +1,59 @@
+# Reusable: checks that the caller repository has the current AI Code Constitution
+# installed and runs the central (tamper-proof) regression guard on the PR diff.
+name: AI Code Constitution
+
+on:
+  workflow_call:
+    inputs:
+      kit-repo:
+        description: Repository that hosts cursor-quality-kit (owner/name)
+        type: string
+        default: alemmle/cursor-quality-kit
+      kit-ref:
+        description: Branch or tag of the kit to compare against
+        type: string
+        default: main
+      working-directory:
+        description: Directory where the kit is installed (for monorepos)
+        type: string
+        default: .
+    secrets:
+      kit-token:
+        description: Token with read access to the kit repository (only needed if it is private)
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  constitution:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/checkout@v7
+        with:
+          repository: ${{ inputs.kit-repo }}
+          ref: ${{ inputs.kit-ref }}
+          path: .quality-kit
+          token: ${{ secrets.kit-token || github.token }}
+
+      - name: Installed constitution matches the central kit
+        run: .quality-kit/scripts/check-install.sh "$WORKDIR"
+        env:
+          WORKDIR: ${{ inputs.working-directory }}
+
+      - name: Regression guard on the pull request diff
+        if: github.event_name == 'pull_request'
+        working-directory: ${{ inputs.working-directory }}
+        env:
+          BASE_REF: ${{ github.base_ref }}
+          GUARD_EXCLUDE: '^\.quality-kit/'
+          GUARD_ALLOW_TEST_DELETION: ${{ contains(github.event.pull_request.labels.*.name, 'ai-test-deletion-approved') && '1' || '0' }}
+          GUARD_ALLOW_GATE_CHANGES: ${{ contains(github.event.pull_request.labels.*.name, 'ai-gate-change-approved') && '1' || '0' }}
+          GUARD_ALLOW_MIGRATION_EDIT: ${{ contains(github.event.pull_request.labels.*.name, 'ai-migration-edit-approved') && '1' || '0' }}
+        run: |
+          kit="$GITHUB_WORKSPACE/.quality-kit"
+          "$kit/core/bin/guard.sh" --base "origin/$BASE_REF"

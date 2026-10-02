@@ -1,0 +1,45 @@
+# Reusable: runs the Expo / EAS verification gate (scripts/verify.sh) in the caller repository.
+name: Expo quality gate
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        type: string
+        default: '22'
+      working-directory:
+        description: Directory containing package.json (for monorepos)
+        type: string
+        default: .
+      skip-doctor:
+        description: Skip expo-doctor
+        type: boolean
+        default: false
+      coverage:
+        description: Run Jest with coverage (thresholds come from the jest config)
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: npm
+          cache-dependency-path: ${{ inputs.working-directory }}/package-lock.json
+      - run: npm ci
+      - name: scripts/verify.sh
+        run: ./scripts/verify.sh
+        env:
+          CI: 'true'
+          VERIFY_SKIP_DOCTOR: ${{ inputs.skip-doctor && '1' || '0' }}
+          VERIFY_COVERAGE: ${{ inputs.coverage && '1' || '0' }}
