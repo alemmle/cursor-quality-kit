@@ -36,16 +36,8 @@ QUALITY_PATHS='^[.]github/workflows/|^[.]eas/workflows/|^eas[.]json$|^[.]maestro
 NODE_DEPS='expo|react-native|typescript|jest|jest-expo|@testing-library/react-native|vitest|detox|@playwright/test|eslint|eslint-config-expo|@biomejs/biome|prettier|husky|lint-staged|@neondatabase/serverless|drizzle-orm|drizzle-kit|prisma|@prisma/client|zod|@stryker-mutator/core'
 DART_DEPS='flutter_test|integration_test|mocktail|mockito|patrol|flutter_lints|very_good_analysis|bloc_test|golden_toolkit|alchemist|mutation_test|riverpod|flutter_riverpod|bloc|drift|supabase_flutter'
 
-repo_dir() { # repo_dir <arg> -> local path
-  if [ -d "$1" ]; then (cd "$1" && pwd); return; fi
-  case "$1" in
-    */*)
-      local dest="$out/clones/${1//\//__}"
-      [ -d "$dest/.git" ] || git clone -q --depth 1 "https://github.com/$1.git" "$dest" >&2
-      printf '%s\n' "$dest" ;;
-    *) echo "inventory: $1 is neither a directory nor owner/name" >&2; return 1 ;;
-  esac
-}
+# shellcheck source=scripts/lib.sh
+. "$(dirname "$0")/lib.sh"
 
 list_files() { # tracked files, or every file outside dependency folders when not a git repo
   if git -C "$1" rev-parse --git-dir >/dev/null 2>&1; then
@@ -78,7 +70,7 @@ details="$out/details.tmp"
 : >"$summary"; : >"$details"
 
 for arg in "${repos[@]}"; do
-  dir="$(repo_dir "$arg")" || continue
+  dir="$(repo_dir "$arg" "$out/clones")" || continue
   name="$(basename "$arg")"
   files="$out/files.tmp"
   list_files "$dir" | grep -v -E '(^|/)(node_modules|Pods|build|\.dart_tool)/' >"$files" || true

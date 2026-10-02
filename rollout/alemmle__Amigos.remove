@@ -1,0 +1,17 @@
+# App-dev pack skills the kit's constitution, rules and skills now cover (docs/RECONCILIATION.md).
+.agents/skills/repository-source-of-truth
+.agents/skills/incremental-change
+.agents/skills/scope-control
+.agents/skills/refactoring-detector
+.agents/skills/dependency-gatekeeper
+.agents/skills/test-enforcement
+.agents/skills/security-review
+.agents/skills/documentation-sync
+.cursor/skills/repository-source-of-truth
+.cursor/skills/incremental-change
+.cursor/skills/scope-control
+.cursor/skills/refactoring-detector
+.cursor/skills/dependency-gatekeeper
+.cursor/skills/test-enforcement
+.cursor/skills/security-review
+.cursor/skills/documentation-sync

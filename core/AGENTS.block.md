@@ -24,7 +24,7 @@ This repository follows the AI Code Constitution in `.ai/CONSTITUTION.md` and th
 
 ### Skills
 
-Step-by-step procedures live in `{{SKILLS_DIR}}/<name>/SKILL.md`. Tools without skill support should open the matching file and follow it:
+Step-by-step procedures live in `{{SKILLS_DIR}}/<name>/SKILL.md`. Tools without skill support should open the matching file and follow it. When asked to remember a lesson or turn it into a rule or skill, follow `capture-learning`: generic lessons are marked and flow back into the quality kit for every repository.
 
 {{SKILLS}}
 

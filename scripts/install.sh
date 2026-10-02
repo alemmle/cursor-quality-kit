@@ -19,6 +19,8 @@ Options:
   --kit-ref <ref>      Branch or tag the target's CI should use (default: main)
   --skills-dir <dir>   Where skills are installed (default: .claude/skills;
                        Cursor and Claude Code both load skills from there)
+  --verify-cmd <cmd>   Create scripts/verify.sh (if missing) as the regression guard
+                       followed by <cmd>, instead of the stack template
   --no-hooks           Do not set git core.hooksPath
   --force              Overwrite project templates (verify.sh, configs, workflows)
   -h, --help           Show this help
@@ -31,6 +33,7 @@ kit_ref="main"
 skills_dir=".claude/skills"
 hooks=1
 force=0
+verify_cmd=""
 target=""
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -38,6 +41,7 @@ while [ $# -gt 0 ]; do
     --kit-repo) kit_repo="${2:?}"; shift ;;
     --kit-ref) kit_ref="${2:?}"; shift ;;
     --skills-dir) skills_dir="${2:?}"; shift ;;
+    --verify-cmd) verify_cmd="${2:?}"; shift ;;
     --no-hooks) hooks=0 ;;
     --force) force=1 ;;
     -h|--help) usage; exit 0 ;;
@@ -211,6 +215,19 @@ template() {
   say created "$2"
 }
 
+# has_own_config <jest|eslint>: the project configures the tool itself (two configs make jest fail).
+has_own_config() {
+  local f
+  for f in "$target/$1.config."* "$target/.${1}rc"*; do
+    [ -e "$f" ] && case "$f" in "$target/jest.config.js"|"$target/eslint.config.js") ;; *) return 0 ;; esac
+  done
+  [ -f "$target/package.json" ] || return 1
+  case "$1" in
+    jest) grep -q '"jest"[[:space:]]*:[[:space:]]*{' "$target/package.json" ;;
+    *) grep -q '"eslintConfig"' "$target/package.json" ;;
+  esac
+}
+
 echo "cursor-quality-kit $VERSION -> $target (stack: $stack)"
 
 echo "Constitution, acceptance criteria and gate scripts"
@@ -263,6 +280,42 @@ while IFS= read -r d; do
   say managed "$skills_dir/$name/"
 done < <(skill_dirs)
 
+echo "Proposals for the kit (core/skills/capture-learning)"
+PROPOSAL='^<!-- quality-kit:propose (core|stack)( amends [A-Za-z0-9._-]+)? -->'
+proposal_line() { grep -m1 -E "$PROPOSAL" "$1" 2>/dev/null || true; }
+for f in "$target"/.cursor/rules/*.mdc; do
+  [ -f "$f" ] || continue
+  n="$(basename "$f" .mdc)"
+  case "$n" in qk-*) continue ;; esac
+  line="$(proposal_line "$f")"
+  case "$line" in
+    "") ;;
+    *" amends "*) say pending ".cursor/rules/$n.mdc amends a kit rule; delete it once its harvest pull request is merged or closed" ;;
+    *) if [ -f "$target/.cursor/rules/qk-$n.mdc" ]; then
+         rm -f "$f"; say removed ".cursor/rules/$n.mdc (the kit now ships it as qk-$n.mdc)"
+       else
+         say pending ".cursor/rules/$n.mdc"
+       fi ;;
+  esac
+done
+for root in .claude/skills .cursor/skills .agents/skills; do
+  for s in "$target/$root"/*/SKILL.md; do
+    [ -f "$s" ] || continue
+    n="$(basename "$(dirname "$s")")"
+    grep -qxF "$root/$n" "$manifest" && continue
+    line="$(proposal_line "$s")"
+    case "$line" in
+      "") ;;
+      *" amends "*) say pending "$root/$n/ amends a kit skill; delete it once its harvest pull request is merged or closed" ;;
+      *) if grep -qxF "$skills_dir/$n" "$manifest"; then
+           rm -rf "${target:?}/$root/$n"; say removed "$root/$n/ (the kit now ships it as $skills_dir/$n/)"
+         else
+           say pending "$root/$n/"
+         fi ;;
+    esac
+  done
+done
+
 echo "Git hooks"
 for h in pre-commit pre-push; do
   if [ -e "$target/.githooks/$h" ] && [ "$force" != "1" ] && ! grep -q 'cursor-quality-kit' "$target/.githooks/$h"; then
@@ -286,18 +339,45 @@ echo "Agent hooks (Cursor, Claude Code, Codex): gate before the agent may finish
 for pair in "cursor-hooks.json:.cursor/hooks.json" "claude-settings.json:.claude/settings.json" "codex-hooks.json:.codex/hooks.json"; do
   src="$KIT_DIR/core/templates/agent-hooks/${pair%%:*}" dest="${pair#*:}"
   if [ -e "$target/$dest" ] && [ "$force" != "1" ] && ! grep -q 'agent-hook[.]sh' "$target/$dest"; then
-    say warn "$dest exists without the kit hooks. Merge the entries from $src into it."
+    render "$src" >"$tmp/hooks.json"
+    # Keeps the project's settings and hook entries and appends the kit's entries to each event.
+    if command -v jq >/dev/null 2>&1 &&
+      jq -s '.[0] as $p | .[1] as $k | (($k | del(.hooks)) * $p)
+        | .hooks = reduce (($k.hooks // {}) | keys[]) as $e (($p.hooks // {}); .[$e] = ((.[$e] // []) + $k.hooks[$e]))' \
+        "$target/$dest" "$tmp/hooks.json" >"$tmp/merged.json" 2>/dev/null; then
+      cp "$tmp/merged.json" "$target/$dest"
+      say merged "$dest (kit hooks added, existing settings kept)"
+    else
+      say warn "$dest exists without the kit hooks. Merge the entries from $src into it (or install jq and re-run)."
+    fi
   else
     template "$src" "$dest"
   fi
 done
 
 echo "Project templates"
+if [ -n "$verify_cmd" ] && { [ ! -e "$target/scripts/verify.sh" ] || [ "$force" = "1" ]; }; then
+  mkdir -p "$target/scripts"
+  { sed -e '/^# Replace the placeholder/d' -e '/^step "Project checks"/q' "$KIT_DIR/core/templates/verify.generic.sh"
+    printf '%s\n' "$verify_cmd"; } >"$target/scripts/verify.sh"
+  chmod +x "$target/scripts/verify.sh"
+  say created "scripts/verify.sh (project checks: $verify_cmd)"
+fi
 template "$KIT_DIR/core/templates/PROJECT_STATE.md" "docs/PROJECT_STATE.md"
 template "$KIT_DIR/core/templates/pull_request_template.md" ".github/pull_request_template.md"
 if [ -n "$stack_dir" ] && [ -d "$stack_dir/template" ]; then
   while IFS= read -r -d '' f; do
-    template "$f" "${f#"$stack_dir/template/"}"
+    rel="${f#"$stack_dir/template/"}"
+    case "$rel" in
+      jest.config.js|jest-env.d.ts|jest/*) tool=jest ;;
+      eslint.config.js) tool=eslint ;;
+      *) tool="" ;;
+    esac
+    if [ -n "$tool" ] && { [ -n "$verify_cmd" ] || has_own_config "$tool"; }; then
+      say kept "$rel not added (the project's own $tool setup or --verify-cmd checks apply)"
+      continue
+    fi
+    template "$f" "$rel"
   done < <(find "$stack_dir/template" -type f -print0 | sort -z)
   for t in $shared_templates; do
     require "$KIT_DIR/shared/templates/$t"
