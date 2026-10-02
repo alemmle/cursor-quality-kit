@@ -122,7 +122,7 @@ scan "$ALL" 'postgres(ql)?://[^:/@[:space:]]+:[^@[:space:]]+@' \
   "Database connection string with a password added. Use an environment variable / secret store."
 scan "$ALL" 'AKIA[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9]{36}|xox[abprs]-[A-Za-z0-9-]{10,}|sk-[A-Za-z0-9_-]{32,}' \
   "Credential-like token added."
-scan "$ALL" 'EXPO_PUBLIC_[A-Z0-9_]*(SECRET|PASSWORD|PRIVATE|DATABASE_URL|SERVICE_ROLE)' \
+scan "$ALL" 'EXPO_PUBLIC_[A-Z0-9_]*(SECRET|PASSWORD|PRIVATE|DATABASE_URL|SERVICE_ROLE|OPENAI|ANTHROPIC)' \
   "EXPO_PUBLIC_ variables are compiled into the app bundle and are public. Keep this on the server."
 
 env_files="$(names_matching A '(^|/)[.]env([.][A-Za-z0-9_-]+)?$' | grep -Ev '[.](example|sample|template)$' || true)"

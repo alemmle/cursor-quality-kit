@@ -128,6 +128,7 @@ guard_case "blocks : any" "Explicit 'any'" src/a.ts "export function f(x: any) {
 guard_case "blocks postgres password" 'connection string' src/a.ts "const u = 'postgresql://neondb_owner:s3cret@ep-1.neon.tech/neondb';"
 guard_case "blocks private key" 'Private key' notes.txt "-----BEGIN RSA PRIVATE KEY-----"
 guard_case "blocks EXPO_PUBLIC secret" 'EXPO_PUBLIC_' app.config.ts "const k = process.env.EXPO_PUBLIC_API_SECRET;"
+guard_case "blocks EXPO_PUBLIC AI provider key" 'EXPO_PUBLIC_' src/ai.ts "const k = process.env.EXPO_PUBLIC_OPENAI_API_KEY;"
 guard_case "blocks committed .env" '.env file added' .env "API_KEY=x"
 
 printf '%s\n' "export const d = (1 as any); // ai-guard: allow third-party types are wrong" >>"$repo/src/a.ts"
