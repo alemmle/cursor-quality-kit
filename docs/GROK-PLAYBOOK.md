@@ -25,6 +25,7 @@ The vendor guidance and research behind this are summarized in [RESEARCH.md](RES
 | Fixes symptoms; the same bug comes back | `fix-bug-with-regression-test` skill: failing test first, root cause written down |
 | Puts the Neon connection string or secrets in the app | Expo/Neon rules, `guard.sh` secret and `EXPO_PUBLIC_*` checks |
 | Leaves a catalog, threshold, label, or other enrichable value as an unmarked literal | Art. 9; `code-review` asks. The guard does not flag literals: protocol fields, status codes, and type discriminants stay in source |
+| Leaves two living documents on one subject, or reads `docs/archive/` on an ordinary task | Art. 12.4-12.5; `code-review`. The archive stays in git so the history is kept |
 | Edits an applied migration or drops columns that shipped apps still use | `neon-schema-change` skill (expand, then contract), guard blocks edits to existing migration files, per-PR Neon branch |
 | Ships an OTA update that needs native code | `eas-build-and-release` skill (runtime version / fingerprint policy) |
 | Screen works in Jest but is broken on iOS | Maestro flows on an EAS simulator build (`.eas/workflows/e2e-test-ios.yml`) |
@@ -33,7 +34,7 @@ The vendor guidance and research behind this are summarized in [RESEARCH.md](RES
 
 **Split thinking from typing.** Use your strongest model (Opus 5.5 or Fable 5.1, or Plan mode) to write the plan with the `plan-small-change` skill. Paste the approved plan into the PR description or `docs/plans/<feature>.md`. Then let Grok execute one step at a time. Optionally review the finished PR with a strong model or Bugbot.
 
-**One step per chat.** Start a fresh chat for each plan step and attach only `@AGENTS.md`, `@docs/PROJECT_STATE.md`, the plan, and the files for that step. Long chats with many edits are where instruction-following degrades the most.
+**One step per chat.** Start a fresh chat for each plan step and attach only `@AGENTS.md`, `@docs/PROJECT_STATE.md`, the plan, and the files for that step. Do not attach `docs/archive/`. Open a file there only when the task is that history. Long chats with many edits are where instruction-following degrades the most.
 
 **Make the agent prove it.** Allow-list `./scripts/verify.sh` for auto-run in Cursor so the agent runs it without asking, and require the real output in every final message.
 

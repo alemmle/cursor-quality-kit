@@ -13,6 +13,7 @@ Non-negotiable, regardless of model:
 - Non-trivial task: write the plan first (files, changes, risks, test plan). Execute one step at a time; run `./scripts/verify.sh` after each step.
 - Smallest diff that solves the task. Do not touch unrelated code. Do not create duplicate helpers, hooks, services, or components; search first.
 - A value that product will enrich, or that differs by deploy, does not live as an unmarked literal. Use the project's config, environment, or table. A literal is only for a marked prototype or mock, or for a true program constant.
+- A Markdown file that supersedes another moves the old one to `docs/archive/` with a banner, in the same change. Do not read `docs/archive/` unless the task asks for that history.
 - Do not use any API, prop, config key, or CLI flag until you have confirmed it exists in the installed version (check `node_modules`, lockfile, or `pubspec.lock`).
 - Bug fix: write a failing test that reproduces it, then fix.
 - Never delete, skip, `.only`, or weaken tests. Never add `@ts-ignore`, `eslint-disable`, `any`, or `// ignore:` to get green.
