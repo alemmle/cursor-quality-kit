@@ -45,7 +45,7 @@ Sources: [Rules](https://cursor.com/docs/context/rules), [Hooks](https://cursor.
 | `stop` hook with `followup_message` re-prompts the agent (default `loop_limit` 5). `beforeShellExecution` can deny commands; exit code 2 means deny | `.cursor/hooks.json` |
 | Cloud agents run project hooks from `.cursor/hooks.json`, not user hooks | Hooks are committed per repository |
 | Cursor also loads `.claude/settings.json` hooks (on by default), and `Stop` fires for internal sessions too | `agent-hook.sh --format claude` ignores payloads with `cursor_version`, so nothing runs twice |
-| Projects: a coordinator plans and delegates; shared context syncs across cloud and local agents; subscriptions act without a prompt | Constitution Art. 1 (shared context is scratch), Art. 3.4 / `orchestrate-workers` (coordinator is an orchestrator), Art. 7 (coordinator is not the reviewer), Art. 13 (subscription is not human approval), Art. 14 (Projects are tool defaults). How-to in `docs/GROK-PLAYBOOK.md`. Not a MUST to use Projects: the kit is tool-agnostic |
+| Projects: a coordinator plans and delegates; shared context syncs across cloud and local agents; subscriptions act without a prompt | Constitution Art. 1 (shared context is scratch), Art. 3.4 / `orchestrate-workers` (coordinator is an orchestrator), Art. 7 (coordinator is not the reviewer), Art. 13 (subscription is not human approval), Art. 14 (Projects are tool defaults). Installed skill `cursor-project`; human how-to in `docs/GROK-PLAYBOOK.md`. Not a MUST to use Projects: the kit is tool-agnostic |
 
 ### AGENTS.md and Spec Kit
 

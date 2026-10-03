@@ -7,7 +7,7 @@ description: Split work across parallel worker agents or sessions and land what 
 
 A worker's report is a claim. The orchestrator owns correctness: it decides the shape of the work, keeps the risky parts, and re-verifies everything that comes back.
 
-This skill applies whenever something plans and delegates instead of implementing: a human splitting chats, a parent agent spawning workers, or a Cursor Project coordinator. The coordinator does not write the code; it still follows every step below. Tool-local shared context is scratch (Constitution Article 1). Durable lessons go through `capture-learning`.
+This skill applies whenever something plans and delegates instead of implementing: a human splitting chats, a parent agent spawning workers, or a Cursor Project coordinator. If you are that coordinator, start from `cursor-project`, then follow every step below. The coordinator does not write the code. Tool-local shared context is scratch (Constitution Article 1). Durable lessons go through `capture-learning`.
 
 ## 1. Decide what to dispatch
 

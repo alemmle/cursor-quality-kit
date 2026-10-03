@@ -61,14 +61,14 @@ Finish with: changed files, the last 30 lines of verify.sh output, and what you 
 
 Cursor [Projects](https://cursor.com/docs/agent/projects) (docs checked 2026-10-03) are a Cursor product: a coordinator agent that plans a body of work that outlives one chat, delegates to cloud (and sometimes local) agents, keeps shared context across those agents, and can subscribe to Slack, schedules, PRs, and CI. They are not a second constitution.
 
-**Fit.** The constitution stays model-agnostic. Projects are a tool default (Article 14). The coordinator is an orchestrator: it follows `orchestrate-workers`. Shared context is scratch until the same text is committed (Article 1). Subscriptions are unattended work (Article 13). The coordinator is not the judgement reviewer of the diffs it delegated (Article 7).
+**Fit.** The constitution stays model-agnostic. Projects are a tool default (Article 14). Installed repositories load the `cursor-project` skill when the coordinator (or the user) is running a Project; that skill binds the coordinator to `orchestrate-workers`, `plan-small-change`, `capture-learning`, and `code-review`. Shared context is scratch until the same text is committed (Article 1). Subscriptions are unattended work (Article 13). The coordinator is not the judgement reviewer of the diffs it delegated (Article 7).
 
 **When to open a Project.** Use one for work that will span several pull requests or weeks: a feature, a migration, or recurring maintenance. Use a normal Agent chat for a one-file fix or a single plan step.
 
 **How to run it under the kit.**
 
 1. Point the Project at the GitHub repository that already has the kit. Cloud agents clone that repo, so `AGENTS.md`, `.cursor/rules`, skills, and `.cursor/hooks.json` apply. The local `core.hooksPath` git hook does not; the in-chat hook and CI still do.
-2. Tell the coordinator the constitution is binding and to follow `orchestrate-workers`: disjoint file scopes, one logical change per PR, `./scripts/verify.sh` on each lane and after each merge, no `--no-verify`.
+2. Tell the coordinator to follow the `cursor-project` skill (constitution binding, `orchestrate-workers`, one logical change per PR, `./scripts/verify.sh` on each lane and after each merge, no `--no-verify`).
 3. Approve the plan the way Article 3 already requires (files, risks, tests). Do not let the coordinator invent parallel lanes that share a file or a global counter (migrations, schema version, IDs). Each delegated agent is one plan step (the "one step per chat" rule still applies to Grok workers). The Project's long-lived context is for the coordinator, not a license for one worker to implement the whole feature.
 4. When a worker "figures out how to test a service", do not leave that only in Project shared context. Run `capture-learning` so it lands in a committed rule or skill and can be harvested.
 5. You (or a different model) run `code-review` on each PR. The coordinator bringing work "back to you to check" is the human gate, not a rubber stamp.

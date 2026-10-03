@@ -162,7 +162,7 @@ core/                      installed in every repository
   githooks/                pre-commit, pre-push
   skills/                  plan-small-change, fix-bug-with-regression-test, verify-before-done,
                            debugging-protocol, code-review, ai-regression-protocol, orchestrate-workers,
-                           capture-learning
+                           capture-learning, cursor-project
   templates/               PROJECT_STATE.md, PR template, generic verify.sh and workflow, agent-hooks/
 shared/                    rules, skills, templates reused by several stacks (stack.conf picks them)
 stacks/<stack>/            stack.conf, AGENTS section, Cursor rules, skills, project templates
