@@ -32,6 +32,7 @@ Read the task/issue and the plan. For each changed file answer:
 8. **Mobile specifics?** Native changes flagged as needing a new build; OTA safety; loading/empty/error states; accessibility labels and `testID`s.
 9. **Report honest?** The author's "verified" claims match CI output.
 10. **Parametric values?** A new literal that product will enrich, or that differs by deploy, is a blocker unless the file or pull request marks it as a prototype or mock, it is a true program constant (protocol field, status code, type discriminant), or the pull request states why it stays in source (Article 9). Do not flag those constants. Secrets stay under the security check.
+11. **Superseded docs?** A new or replacement Markdown file is a blocker when an older document on the same subject is still in the living tree, or when the new file repeats the archived body. The old file belongs in `docs/archive/` with the banner `Superseded by <path> on <date>. Do not follow this file.` (Article 12). A document that still answers a different question stays, with a cross-link.
 
 ## 3. Verdict
 

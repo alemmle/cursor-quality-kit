@@ -1,6 +1,6 @@
 # AI Code Constitution
 
-Version: 1.6.0
+Version: 1.7.0
 
 This constitution binds every AI coding agent (Cursor, Claude Code, Codex, Copilot, Gemini, Windsurf, Cline, Aider, ...) and every model (Grok, Claude, GPT, Gemini, ...) working in a repository that includes it. It is model-agnostic on purpose: the rules describe observable behavior, and the important ones are enforced by scripts and CI, not by trust.
 
@@ -97,6 +97,9 @@ This constitution binds every AI coding agent (Cursor, Claude Code, Codex, Copil
 1. One logical change per commit, with a message that explains why.
 2. When behavior, setup, or architecture changes, the agent MUST update `AGENTS.md` and/or `docs/PROJECT_STATE.md` in the same PR.
 3. Architectural changes MUST include a short tradeoff explanation (what was chosen, what was rejected, why).
+4. When an agent adds a Markdown document, or replaces the job of an existing one, it MUST search the repository for a document on the same subject. A document the new one supersedes MUST be moved, in the same change, to `docs/archive/`. The archived file MUST start with one banner: `Superseded by <path> on <date>. Do not follow this file.` The replacement MUST link to that path in one line and MUST NOT repeat the archived body. Reading the old file to add the banner is the one time an agent reads it.
+5. Agents MUST NOT read `docs/archive/` unless the current task asks for that history. Required reading stays `AGENTS.md` and `docs/PROJECT_STATE.md` (Article 1).
+6. A document that still answers a different question stays where it is. Point between the two files. Archiving is for a file whose job the new file takes over.
 
 ## Article 13 - When to stop
 

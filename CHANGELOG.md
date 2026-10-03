@@ -2,6 +2,13 @@
 
 Versioning policy: [docs/VERSIONING.md](docs/VERSIONING.md).
 
+## 1.7.0
+
+Superseded documents move to an archive.
+
+- Constitution Article 12.4-12.6: a new Markdown document that takes over an older one's job moves that file, in the same change, to `docs/archive/` with a one-line superseded banner. The replacement links to it and does not repeat the body. Agents do not read the archive unless the task asks for that history. A document that still answers a different question stays, with a cross-link.
+- `code-review` treats a living predecessor, or a new file that repeats the archived body, as a blocker. `diff-review` allows `docs/archive/` beside a scoped change, the same way it allows `docs/PROJECT_STATE.md`. The archive stays in git.
+
 ## 1.6.0
 
 Parametric values.

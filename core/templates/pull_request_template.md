@@ -35,6 +35,7 @@
 - [ ] Migrations are new files and backward compatible with the shipped app
 - [ ] Native changes flagged (need a new build, not an OTA update)
 - [ ] `AGENTS.md` / `docs/PROJECT_STATE.md` updated if behavior or setup changed
+- [ ] A Markdown file that replaces an older one moves that file to `docs/archive/` with a superseded banner, and does not repeat the old body
 
 ## Not verified / risks
 

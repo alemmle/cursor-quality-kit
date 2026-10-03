@@ -47,7 +47,8 @@ if [ -n "${DIFF_EXCLUDE:-}" ]; then
   FRE="$DIFF_EXCLUDE" awk -F'\t' '$NF !~ ENVIRON["FRE"]' "$names" >"$names.f" && mv "$names.f" "$names"
 fi
 
-ALWAYS_ALLOWED='^(AGENTS\.md|CLAUDE\.md|CHANGELOG\.md|docs/PROJECT_STATE\.md|docs/AI_REGRESSIONS\.md|docs/plans/.*)$'
+# docs/archive is allowed beside a scoped change: Article 12 moves superseded docs there.
+ALWAYS_ALLOWED='^(AGENTS\.md|CLAUDE\.md|CHANGELOG\.md|docs/PROJECT_STATE\.md|docs/AI_REGRESSIONS\.md|docs/plans/.*|docs/archive/.*)$'
 TEST_FILES='([.](test|spec)[.][A-Za-z]+$|_test[.](dart|py|go)$|(^|/)(__tests__|test|tests|integration_test|e2e|[.]maestro)/)'
 CODE='[.](ts|tsx|js|jsx|mjs|cjs|dart|py|kt|swift|go)$'
 NOT_SOURCE='(^|/)([^/]*[.]config[.][a-z]+|[^/]*[.]d[.]ts|babel[.]config[.]js|metro[.]config[.]js)$|^(scripts|[.]github|[.]ai|[.]githooks|[.]eas|tools)/'
