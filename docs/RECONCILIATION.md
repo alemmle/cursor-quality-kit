@@ -51,11 +51,11 @@ The inventory itself had a gap: it ignored `.cursor/skills/`, where Cursor loads
 | `refactoring-detector`, `architecture-guard` (no duplicate abstractions) | Amigos | Article 2.4, `plan-small-change` "Reuse" |
 | `dependency-gatekeeper` | Amigos | Article 4.2, `qk-01-scope.mdc`, `qk-10` (`npx expo install`) |
 | `test-enforcement` (except the two lines moved above) | Amigos | Article 5, `qk-03-testing.mdc`, `verify-before-done` |
-| `security-review` | Amigos | Article 9, `qk-02-security.mdc` |
-| `documentation-sync`, `adr-writer` | Amigos | Article 11.2-11.3, `PROJECT_STATE.md` template "Decisions" |
-| `handover` | Amigos; ANDITWIN `session-orientation`, `session-handover` | Articles 1.2, 10, 11.2 and `docs/PROJECT_STATE.md`; both apps' versions are tied to their own state documents and stay there |
+| `security-review` | Amigos | Article 10, `qk-02-security.mdc` |
+| `documentation-sync`, `adr-writer` | Amigos | Article 12.2-12.3, `PROJECT_STATE.md` template "Decisions" |
+| `handover` | Amigos; ANDITWIN `session-orientation`, `session-handover` | Articles 1.2, 11, 12.2 and `docs/PROJECT_STATE.md`; both apps' versions are tied to their own state documents and stay there |
 | `verify-bench` (local bench mirrors CI; green bench means done) | ANDITWIN | Article 6, `scripts/verify.sh`, `verify-before-done`, agent `stop` hook |
-| "Fake nothing; name every boundary; deviations are named, never silent" | ANDITWIN `CLAUDE.md` | Articles 10 and 12 |
+| "Fake nothing; name every boundary; deviations are named, never silent" | ANDITWIN `CLAUDE.md` | Articles 11 and 13 |
 | `work-package-plan` (plan before code, sequencing, out of scope) | ANDITWIN | Article 3, `plan-small-change` |
 | Sibling rule (a defect is checked on all sibling screens and channels) | Amigos `evidence-gate` | `fix-bug-with-regression-test` step 7 |
 | Pre-commit fails closed when its checks cannot run | ANDITWIN `.githooks/pre-commit` | Kit hooks use `set -euo pipefail` and `exec`, so a missing tool fails the commit |
@@ -66,7 +66,7 @@ The inventory itself had a gap: it ignored `.cursor/skills/`, where Cursor loads
 ## Considered and not adopted
 
 - **Third-party "Cursor app-dev" pack skills** in Amigos (`product-value-gate`, `user-journey`, `ux-consistency`, `simplicity-guard`, `model-routing`, `technical-debt-tracker`, `context-minimization`, `release-readiness`, `ci-cd-compliance`): installed by Amigos PR #75 from an outside pack, with no lock entry and no stated licence. Their generic intent is covered above where it overlapped; copying the pack would put someone else's text under the kit's version. `ci-cd-compliance` informed `qk-04` but was rewritten, not copied.
-- **ANDITWIN's derived state stamps, register IDs, `[NEEDS CLARIFICATION]` markers, and triage dispositions**: each depends on that repository's own Dart verifiers in CI. The generic part ("stop and name an open question instead of assuming") is Article 12.
+- **ANDITWIN's derived state stamps, register IDs, `[NEEDS CLARIFICATION]` markers, and triage dispositions**: each depends on that repository's own Dart verifiers in CI. The generic part ("stop and name an open question instead of assuming") is Article 13.
 - **"Model IDs never appear in commits, PRs, or code"** (ANDITWIN): a client rule for that repository.
 - **iOS native-stack swipe-back cannot be vetoed from JS; never rely on `preventDefault` in `beforeRemove`** (Amigos ADR 19): plausible for every Expo Router app, but not yet verified against the React Navigation docs for the installed version. Stays in Amigos until it is.
 - **A Next.js stack pack**: Reebay and cookbook-to-cookidoo both use Next.js, but neither repository has rules of its own to move. The only shared text is the block `next dev` writes into `AGENTS.md` itself. Not worth a new stack yet; install them with `--stack none`, which brings the TypeScript rule.

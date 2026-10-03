@@ -1,6 +1,6 @@
 # AI Code Constitution
 
-Version: 1.5.0
+Version: 1.6.0
 
 This constitution binds every AI coding agent (Cursor, Claude Code, Codex, Copilot, Gemini, Windsurf, Cline, Aider, ...) and every model (Grok, Claude, GPT, Gemini, ...) working in a repository that includes it. It is model-agnostic on purpose: the rules describe observable behavior, and the important ones are enforced by scripts and CI, not by trust.
 
@@ -64,25 +64,41 @@ This constitution binds every AI coding agent (Cursor, Claude Code, Codex, Copil
 2. Destructive operations (dropping tables or columns, deleting data, rewriting history) require explicit human approval in the current task.
 3. Agents MUST NOT run anything against production data or production databases. Use local, preview, or per-branch databases.
 
-## Article 9 - Security and secrets
+## Article 9 - Parametric values
+
+1. A value that can change without changing the program SHOULD live outside the source, in the place this table names.
+
+| Kind of value | Where it lives |
+| --- | --- |
+| Prototype or mock, marked as such in the file or the pull request | A literal in code is allowed |
+| Secret or connection string | The platform secret store or a git-ignored environment file (Article 10) |
+| Value that differs by deploy (API host, feature flag for a build) | Environment or platform config, not the source |
+| Value that product will enrich or update (catalogs, thresholds, labels, rules) | A configuration file in the repository, or a database table, whichever the project already uses |
+| True constant of the program (protocol field, status code, type discriminant) | The source. When a reviewer asks, say why it is a constant |
+
+2. A prototype or mock that keeps a literal MUST be marked in the file or in the pull request. An unmarked literal is treated as implementation and follows the table.
+3. Agents MUST NOT add a configuration mechanism or table when the project already has one for that kind of value. Search first; reuse or extend it.
+4. Review judges this article (`code-review`). The regression guard does not flag literals.
+
+## Article 10 - Security and secrets
 
 1. Agents MUST NOT commit secrets, tokens, connection strings with passwords, or private keys. Secrets live in the platform's secret store (EAS secrets, GitHub secrets, `.env` files that are git-ignored).
 2. Anything shipped inside a mobile app binary is public. Mobile clients MUST NOT contain database credentials or privileged API keys; they talk to a backend that enforces authorization.
 3. All input crossing a trust boundary (network, user input, deep links, storage) MUST be validated.
 
-## Article 10 - Honest reporting
+## Article 11 - Honest reporting
 
 1. At the end of every task the agent MUST report: what changed, what was verified and how (commands and results), and what was NOT verified.
 2. Agents MUST NOT describe intended behavior as tested behavior.
 3. Known risks, skipped steps, and follow-ups MUST be listed, not hidden.
 
-## Article 11 - Commits and documentation
+## Article 12 - Commits and documentation
 
 1. One logical change per commit, with a message that explains why.
 2. When behavior, setup, or architecture changes, the agent MUST update `AGENTS.md` and/or `docs/PROJECT_STATE.md` in the same PR.
 3. Architectural changes MUST include a short tradeoff explanation (what was chosen, what was rejected, why).
 
-## Article 12 - When to stop
+## Article 13 - When to stop
 
 Agents MUST stop and ask (or, when running unattended, choose the safest option and document it) when:
 
@@ -91,7 +107,7 @@ Agents MUST stop and ask (or, when running unattended, choose the safest option 
 - requirements are ambiguous in a way that changes user-visible behavior;
 - the change would touch payments, authentication, data deletion, or production infrastructure.
 
-## Article 13 - Precedence and amendments
+## Article 14 - Precedence and amendments
 
 1. Order of precedence: explicit human instruction in the current task > repository `AGENTS.md` > this constitution > tool defaults.
 2. A repository MAY tighten these rules. It MUST NOT loosen a MUST rule except through a pull request that changes the repository's `AGENTS.md` and is approved by a human.

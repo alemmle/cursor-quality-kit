@@ -2,6 +2,13 @@
 
 Versioning policy: [docs/VERSIONING.md](docs/VERSIONING.md).
 
+## 1.6.0
+
+Parametric values.
+
+- Constitution Article 9: a value that can change without changing the program lives outside the source. A literal is allowed for a prototype or mock marked in the file or the pull request, and for a true program constant (protocol field, status code, type discriminant). Secrets stay in the secret store (Article 10). A value that differs by deploy lives in environment or platform config. A value that product will enrich or update (catalogs, thresholds, labels, rules) lives in a configuration file or a database table the project already uses. Later articles are renumbered: security is Article 10, honest reporting is Article 11, commits are Article 12, when to stop is Article 13, precedence is Article 14.
+- `code-review` asks whether a new literal of that kind belongs outside the source. The regression guard does not flag literals.
+
 ## 1.5.0
 
 Rollout to app repositories.

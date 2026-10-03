@@ -15,7 +15,7 @@ Sources: [Best practices](https://www.anthropic.com/engineering/claude-code-best
 | Use `PreToolUse` hooks to block specific commands (exit code 2) | `agent-hook.sh pre-shell` |
 | Keep `CLAUDE.md` short. A bloated file makes the model ignore rules. Put occasional workflows in skills | `CLAUDE.md` is a thin adapter; procedures are skills |
 | Explore, then plan, then code. Skip planning only when the diff fits in one sentence | Constitution Art. 3, `plan-small-change` skill |
-| After two failed corrections, clear the context and start fresh with a better prompt | Art. 12; one step per chat in the Grok playbook |
+| After two failed corrections, clear the context and start fresh with a better prompt | Art. 13; one step per chat in the Grok playbook |
 | Adversarial review in a fresh context (writer/reviewer). Tell the reviewer to report only correctness gaps to avoid over-engineering | Art. 7.3, `code-review` skill |
 | Have one session write tests and another write the code | Art. 5.8 (held-out acceptance tests) |
 
@@ -49,7 +49,7 @@ Sources: [Rules](https://cursor.com/docs/context/rules), [Hooks](https://cursor.
 ### AGENTS.md and Spec Kit
 
 - [agents.md](https://agents.md/): an open format, now stewarded by the Linux Foundation's Agentic AI Foundation. Read by Codex, Cursor, Jules, Gemini CLI, Windsurf, Aider, Zed, Warp, and others. The closest file wins; explicit chat instructions override it.
-- [GitHub Spec Kit](https://github.com/github/spec-kit) keeps a versioned project constitution in `.specify/memory/constitution.md`, with nine articles including test-first and simplicity. `/speckit.analyze` treats a conflict with a MUST rule as critical, and violations are fixed by changing the spec, not by weakening the principle. Same idea as this kit's Art. 13. Spec Kit checks plans against the constitution; this kit checks code and diffs. They can be used together.
+- [GitHub Spec Kit](https://github.com/github/spec-kit) keeps a versioned project constitution in `.specify/memory/constitution.md`, with nine articles including test-first and simplicity. `/speckit.analyze` treats a conflict with a MUST rule as critical, and violations are fixed by changing the spec, not by weakening the principle. Same idea as this kit's Art. 14. Spec Kit checks plans against the constitution; this kit checks code and diffs. They can be used together.
 
 ## Research on agents gaming tests
 

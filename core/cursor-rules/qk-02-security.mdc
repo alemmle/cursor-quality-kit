@@ -14,4 +14,4 @@ alwaysApply: true
 - Do not log secrets, tokens, passwords, full request bodies with personal data, or connection strings.
 - Do not weaken security settings (CORS `*`, disabled TLS verification, `NSAllowsArbitraryLoads`, broad permissions) to make something work. If it seems required, stop and ask.
 - New dependencies: prefer well-maintained packages; mention any package with install scripts or native code in your report.
-- Authentication, payments, data deletion, and permission changes always need human review (Constitution Article 12).
+- Authentication, payments, data deletion, and permission changes always need human review (Constitution Article 13).
