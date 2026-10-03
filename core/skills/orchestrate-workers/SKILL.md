@@ -1,11 +1,13 @@
 ---
 name: orchestrate-workers
-description: Split work across parallel worker agents or sessions and land what they hand back without trusting their reports - partition, brief, review, re-verify, commit only their files, merge in order. Use whenever you dispatch sub-agents, background agents, or parallel sessions, and before merging work another agent produced.
+description: Split work across parallel worker agents or sessions and land what they hand back without trusting their reports - partition, brief, review, re-verify, commit only their files, merge in order. Use whenever you dispatch sub-agents, background agents, Cursor Project coordinators, or parallel sessions, and before merging work another agent produced.
 ---
 
 # Orchestrate worker agents
 
 A worker's report is a claim. The orchestrator owns correctness: it decides the shape of the work, keeps the risky parts, and re-verifies everything that comes back.
+
+This skill applies whenever something plans and delegates instead of implementing: a human splitting chats, a parent agent spawning workers, or a Cursor Project coordinator. The coordinator does not write the code; it still follows every step below. Tool-local shared context is scratch (Constitution Article 1). Durable lessons go through `capture-learning`.
 
 ## 1. Decide what to dispatch
 
@@ -40,3 +42,9 @@ Every clause names a mechanism, not a goal. For each instruction, ask what the l
 7. If you changed a contract a worker relied on, tell the worker or fix its code before merging.
 
 An empty check list is not a pass: if CI shows no runs for a commit, find out why before calling it green.
+
+## 5. Unattended and subscribed work
+
+A schedule, a Slack or pull-request subscription, or any other unprompted signal is not human approval (Article 13). Do not dispatch payments, authentication, data deletion, production infrastructure, or destructive migrations from a subscription. Stop and ask, or take the safest no-op and document it.
+
+The orchestrator that planned or delegated a change is not the judgement reviewer of that change (Article 7). Bring the diff to a human or a different model, using `code-review`.

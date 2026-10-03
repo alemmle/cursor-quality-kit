@@ -117,7 +117,7 @@ Change `CONSTITUTION.md`, rules, or skills here, bump `VERSION`, tag a release, 
 
 | Tool | Reads |
 | --- | --- |
-| Cursor | `AGENTS.md`, `.cursor/rules/*.mdc`, `.claude/skills/` |
+| Cursor | `AGENTS.md`, `.cursor/rules/*.mdc`, `.claude/skills/` (a Cursor Project coordinator reads the same files from the cloud clone; shared context is scratch until committed) |
 | Claude Code | `CLAUDE.md` (which imports `AGENTS.md` and the constitution), `.claude/skills/` |
 | OpenAI Codex, Jules, Amp, Windsurf, Zed, and other `AGENTS.md`-aware tools | `AGENTS.md` |
 | GitHub Copilot | `.github/copilot-instructions.md`, `AGENTS.md` |

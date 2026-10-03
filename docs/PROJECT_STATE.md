@@ -6,6 +6,7 @@ Central repository for the AI Code Constitution (version in `VERSION`) and the r
 
 ## Status
 
+- Constitution v1.7.0 (see `CHANGELOG.md`): coordinator and unattended-agent rules. Tool-local shared context is scratch until committed; parallel lanes follow `orchestrate-workers`; a subscription is not human approval; a coordinator is not the judgement reviewer of work it delegated. Cursor Projects themselves stay in `docs/GROK-PLAYBOOK.md` (tool-specific). The regression guard does not scan shared-context files.
 - Constitution v1.6.0 (see `CHANGELOG.md`): Article 9, parametric values. A literal is for a marked prototype or mock, or for a true program constant. A value that product will enrich, or that differs by deploy, lives in config, environment, or a table. Judged in `code-review`. The regression guard does not flag literals.
 - Constitution v1.5.0 (see `CHANGELOG.md`): acceptance pipeline (`.ai/bin/accept.sh`, `.ai/bin/diff-review.sh`) and agent hooks (`.ai/bin/agent-hook.sh` for Cursor, Claude Code, Codex). Research behind it: `docs/RESEARCH.md`.
 - Reconciled with the four app repositories (ANDITWIN, Amigos, Reebay, cookbook-to-cookidoo) on 2026-10-02: `docs/RECONCILIATION.md` lists what moved into the kit, what the kit already covered, and what stays in each app's `AGENTS.md`. The kit is not installed in any of them yet.
@@ -20,6 +21,7 @@ Central repository for the AI Code Constitution (version in `VERSION`) and the r
 
 ## Decisions
 
+- 2026-10-03 - Cursor Projects fit the kit as a tool default, not as a MUST in the constitution. Rejected: naming Cursor, requiring a Project per feature, or treating Project shared context as a source of truth. Adopted: Article 1 (uncommitted coordinator/shared context is scratch; durable lessons go through `capture-learning`), Article 3.4 (a coordinator is an orchestrator), Article 7 (the coordinator is not the reviewer), Article 13 (a subscription is not human approval), Article 14 (Projects are tool defaults). How-to lives in `docs/GROK-PLAYBOOK.md`. Tradeoff: Claude Code and Codex do not get a Projects UI, but they get the same rules when they plan-and-delegate.
 - 2026-10-03 - Enrichable product values and deploy-specific values live outside the source (Article 9). A literal stays allowed for a marked prototype or mock, and for a true program constant. Rejected: a regression-guard check on literals, because protocol fields, status codes, type discriminants, and test fixtures are literals on purpose and a script cannot tell them apart. Judged in `code-review`.
 - 2026-10-02 - Enforcement by deterministic scripts (guard, verify, hooks, CI) rather than model-specific prompting. Rejected: per-model rule sets, because they drift and do not catch defects. Rules stay model-agnostic; model-specific advice lives in `docs/GROK-PLAYBOOK.md`.
 - 2026-10-02 - Files are vendored into each repository by `install.sh` (pinned by `--kit-ref`), with CI drift detection. Rejected: git submodules (poorly supported by AI tools and easy to leave stale) and runtime downloads (break offline and make agent context depend on the network).

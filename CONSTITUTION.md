@@ -1,6 +1,6 @@
 # AI Code Constitution
 
-Version: 1.6.0
+Version: 1.7.0
 
 This constitution binds every AI coding agent (Cursor, Claude Code, Codex, Copilot, Gemini, Windsurf, Cline, Aider, ...) and every model (Grok, Claude, GPT, Gemini, ...) working in a repository that includes it. It is model-agnostic on purpose: the rules describe observable behavior, and the important ones are enforced by scripts and CI, not by trust.
 
@@ -8,9 +8,10 @@ This constitution binds every AI coding agent (Cursor, Claude Code, Codex, Copil
 
 ## Article 1 - Source of truth
 
-1. The repository is the source of truth. Agents MUST NOT rely on memory of previous chats, training data, or assumptions about how the code "probably" works.
+1. The repository is the source of truth. Agents MUST NOT rely on memory of previous chats, training data, uncommitted tool workspace or coordinator shared context, or assumptions about how the code "probably" works.
 2. Before changing code, agents MUST read, in this order: `AGENTS.md`, `docs/PROJECT_STATE.md` (if present), and every file they intend to modify.
-3. When a statement in a chat conflicts with the code, the code wins until a human says otherwise.
+3. When a statement in a chat, a coordinator brief, or a tool's shared context conflicts with the code, the code wins until a human says otherwise.
+4. A procedure or fact that should bind later sessions MUST be written into the repository (a rule, a skill, `AGENTS.md`, or `docs/PROJECT_STATE.md`) in the same change that depends on it. Files a tool syncs between agents are scratch until they are committed there. Follow `capture-learning`.
 
 ## Article 2 - Scope discipline
 
@@ -25,6 +26,7 @@ This constitution binds every AI coding agent (Cursor, Claude Code, Codex, Copil
 1. For any task that is not a one-file fix, the agent MUST write a plan before editing. The plan lists: files to change, what changes in each, risks, and how the change will be tested.
 2. The plan is executed one step at a time. After each step the verification gate (Article 6) MUST pass before the next step starts.
 3. If reality diverges from the plan (an API is different, a file does not exist), the agent MUST stop, update the plan, and say so. It MUST NOT improvise silently.
+4. Dispatching work to other agents, including a coordinator that only plans and delegates, does not waive this article or Article 2. Each lane MUST have a disjoint file scope, MUST pass the verification gate on its own tree, and MUST be merged only after the merged tree passes the gate. Follow `orchestrate-workers`.
 
 ## Article 4 - No invention
 
@@ -55,7 +57,7 @@ This constitution binds every AI coding agent (Cursor, Claude Code, Codex, Copil
 
 1. Every change, from any tool, model, or human, is judged by the same criteria in `.ai/ACCEPTANCE.md`: types, tests, builds, E2E, mechanical diff review, judgement review. The verdict is ACCEPT or REJECT; there is no "accept with known blockers".
 2. Before asking for review, the author MUST run `.ai/bin/accept.sh` and include its summary in the pull request.
-3. The judgement review MUST be done by a human or by a different model than the one that wrote the change, following the `code-review` skill.
+3. The judgement review MUST be done by a human or by a different model than the one that wrote the change, following the `code-review` skill. An orchestrator or coordinator that planned or delegated the change is not a different reviewer of that change.
 4. A regression traced to an AI-written change MUST be handled with the `ai-regression-protocol` skill: regression test, fix, log entry, and a gate improvement.
 
 ## Article 8 - Data, migrations, and environments
@@ -107,8 +109,10 @@ Agents MUST stop and ask (or, when running unattended, choose the safest option 
 - requirements are ambiguous in a way that changes user-visible behavior;
 - the change would touch payments, authentication, data deletion, or production infrastructure.
 
+A schedule, a chat or pull-request subscription, or any other unprompted signal is not human approval. Unattended agents MUST still obey every MUST rule. They MUST NOT treat a subscription as permission for Article 8.2, payments, authentication, data deletion, or production infrastructure.
+
 ## Article 14 - Precedence and amendments
 
-1. Order of precedence: explicit human instruction in the current task > repository `AGENTS.md` > this constitution > tool defaults.
+1. Order of precedence: explicit human instruction in the current task > repository `AGENTS.md` > this constitution > tool defaults. A tool's coordinator, shared context, automations, and UI defaults are tool defaults.
 2. A repository MAY tighten these rules. It MUST NOT loosen a MUST rule except through a pull request that changes the repository's `AGENTS.md` and is approved by a human.
 3. This constitution is versioned. Repositories record the installed version in `.ai/KIT_VERSION`; CI flags drift from the central copy.

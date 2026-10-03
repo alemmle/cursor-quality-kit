@@ -9,7 +9,7 @@ Every change is judged by the same criteria, no matter which assistant (Grok, Cl
 | 3 | Builds | The app/service builds (Expo: iOS JS bundle via `expo export`; Flutter: `flutter build`; backend: `npm run build`) | `scripts/verify.sh` (`VERIFY_BUILD=1`, on by default in CI) |
 | 4 | E2E | Critical journeys pass on a real build (Expo: Maestro on an EAS iOS simulator build). Required when UI, navigation, native config, or auth changed | EAS Workflow / `VERIFY_E2E=1` |
 | 5 | Diff review (mechanical) | Only in-scope files; no formatting-only churn; no lockfile change without manifest change; source changes come with test changes; size within limits | `.ai/bin/diff-review.sh` |
-| 6 | Diff review (judgement) | The `code-review` protocol finds no blocker. The reviewer is a human or a different model than the author | `code-review` skill |
+| 6 | Diff review (judgement) | The `code-review` protocol finds no blocker. The reviewer is a human or a different model than the author. An orchestrator or coordinator that planned or delegated the change is not a different reviewer | `code-review` skill |
 
 Run stages 1, 2, 3 and 5 locally with one command:
 

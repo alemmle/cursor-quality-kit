@@ -7,6 +7,8 @@ description: Turn a lesson from this session (a repeated mistake, a regression, 
 
 A lesson only helps the next session if it is written where tools load it, and only helps the next app if it reaches the quality kit. This skill does both: the file works in this repository at once, and a marker line lets the kit's harvest workflow propose it upstream as a pull request.
 
+Do not leave the lesson only in a chat, a coordinator brief, or a tool's shared context files. Those are scratch until the same text is in a committed rule, skill, `AGENTS.md`, or `docs/PROJECT_STATE.md` (Constitution Article 1).
+
 ## 1. Is it worth a rule?
 
 Write one when the lesson is likely to recur: the same mistake twice, a regression, a review finding that cost real time, or a stack fact that models get wrong. Skip one-off details of a single task.
