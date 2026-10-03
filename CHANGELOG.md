@@ -2,6 +2,17 @@
 
 Versioning policy: [docs/VERSIONING.md](docs/VERSIONING.md).
 
+## 1.7.0
+
+Coordinator and unattended-agent rules (Cursor Projects as a tool default).
+
+- Constitution Article 1: uncommitted tool workspace and coordinator shared context are not a source of truth. Durable procedures go in the repository via `capture-learning`.
+- Constitution Article 3.4: dispatching work, including a coordinator that only plans and delegates, still requires disjoint file scopes and a green gate per lane and after merge (`orchestrate-workers`).
+- Constitution Article 7: an orchestrator or coordinator that planned or delegated a change is not the judgement reviewer of that change.
+- Constitution Article 13: a schedule or subscription is not human approval.
+- Constitution Article 14: a tool's coordinator, shared context, automations, and UI defaults are tool defaults.
+- `orchestrate-workers`, `capture-learning`, `code-review`, and the always-on constitution rule match those articles. New core skill `cursor-project` is the procedure a Cursor Project coordinator follows (installed in every repository). Human how-to is in `docs/GROK-PLAYBOOK.md`. The regression guard does not scan tool shared-context files.
+
 ## 1.6.0
 
 Parametric values.

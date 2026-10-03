@@ -2,9 +2,9 @@
 
 This repository follows the AI Code Constitution in `.ai/CONSTITUTION.md` and the shared acceptance criteria in `.ai/ACCEPTANCE.md`. Read both before your first change. They apply to every tool and every model; every change is accepted or rejected by the same criteria, whoever wrote it. Summary of the hard rules:
 
-1. Read `AGENTS.md`, `docs/PROJECT_STATE.md`, and every file you will modify before editing. The repository is the source of truth, not chat memory.
+1. Read `AGENTS.md`, `docs/PROJECT_STATE.md`, and every file you will modify before editing. The repository is the source of truth, not chat memory or uncommitted tool workspace.
 2. Smallest change that solves the task. Do not touch unrelated code: no drive-by refactors, renames, reformatting, or dependency changes. No duplicate helpers or services.
-3. Non-trivial task: write a plan (files, changes, risks, test plan) first, then execute one step at a time with the gate green after each step.
+3. Non-trivial task: write a plan (files, changes, risks, test plan) first, then execute one step at a time with the gate green after each step. Parallel workers: disjoint scopes, gate green per lane and after merge (`orchestrate-workers`).
 4. Never use an API, flag, or config key you have not confirmed exists in the installed version.
 5. Bug fix: failing regression test first, then the fix. Feature: tests for the main path and one failure path.
 6. Never delete, skip, focus, or weaken tests, and never add `@ts-ignore` / `eslint-disable` / `// ignore:` / `any` to get green.

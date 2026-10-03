@@ -20,7 +20,10 @@ The vendor guidance and research behind this are summarized in [RESEARCH.md](RES
 | A test contradicts the task and the agent "fixes" whichever side is easier | Art. 5.7: stop and quote both |
 | Makes tests green by skipping, deleting, or weakening them | `guard.sh` blocks `.only`/`.skip`/`xit`/`skip:`, deleted test files, and edits to the gate scripts |
 | Silences the compiler (`any`, `@ts-ignore`, `eslint-disable`, `// ignore:`) | `guard.sh` blocks them unless the line carries `ai-guard: allow <reason>` |
+| Trusts a worker or coordinator report without reading the diff | Art. 3.4, `orchestrate-workers`; the `stop` hook and CI still apply to each worker |
 | Large diffs with drive-by refactors that break unrelated screens | Art. 2/3, `plan-small-change` skill (max 5 files and one subsystem per step, gate green after each step) |
+| Durable lesson lives only in a chat or a tool's shared context | Art. 1.4, `capture-learning`; harvest puts generic lessons in the kit |
+| Unattended / subscribed agent changes production, auth, or data | Art. 13: a subscription is not human approval |
 | Creates a second API client / hook / component for something that exists | Art. 2.4, "search first, reuse" in plan and feature skills |
 | Fixes symptoms; the same bug comes back | `fix-bug-with-regression-test` skill: failing test first, root cause written down |
 | Puts the Neon connection string or secrets in the app | Expo/Neon rules, `guard.sh` secret and `EXPO_PUBLIC_*` checks |
@@ -53,6 +56,25 @@ Finish with: changed files, the last 30 lines of verify.sh output, and what you 
 **Write the acceptance test first, with a different model.** Research shows smaller models pass the visible tests while failing hidden ones more often than frontier models. For each critical journey, have Opus or Fable (or you) write the Maestro flow from the spec before Grok starts. Grok then treats the flow as read-only (Art. 5.8).
 
 **Check that hooks are active.** In Cursor, open the Hooks output channel and confirm `.cursor/hooks.json` loaded. The repository must be a trusted workspace. Codex asks you to review and trust `.codex/hooks.json` once.
+
+## Working with Cursor Projects
+
+Cursor [Projects](https://cursor.com/docs/agent/projects) (docs checked 2026-10-03) are a Cursor product: a coordinator agent that plans a body of work that outlives one chat, delegates to cloud (and sometimes local) agents, keeps shared context across those agents, and can subscribe to Slack, schedules, PRs, and CI. They are not a second constitution.
+
+**Fit.** The constitution stays model-agnostic. Projects are a tool default (Article 14). Installed repositories load the `cursor-project` skill when the coordinator (or the user) is running a Project; that skill binds the coordinator to `orchestrate-workers`, `plan-small-change`, `capture-learning`, and `code-review`. Shared context is scratch until the same text is committed (Article 1). Subscriptions are unattended work (Article 13). The coordinator is not the judgement reviewer of the diffs it delegated (Article 7).
+
+**When to open a Project.** Use one for work that will span several pull requests or weeks: a feature, a migration, or recurring maintenance. Use a normal Agent chat for a one-file fix or a single plan step.
+
+**How to run it under the kit.**
+
+1. Point the Project at the GitHub repository that already has the kit. Cloud agents clone that repo, so `AGENTS.md`, `.cursor/rules`, skills, and `.cursor/hooks.json` apply. The local `core.hooksPath` git hook does not; the in-chat hook and CI still do.
+2. Tell the coordinator to follow the `cursor-project` skill (constitution binding, `orchestrate-workers`, one logical change per PR, `./scripts/verify.sh` on each lane and after each merge, no `--no-verify`).
+3. Approve the plan the way Article 3 already requires (files, risks, tests). Do not let the coordinator invent parallel lanes that share a file or a global counter (migrations, schema version, IDs). Each delegated agent is one plan step (the "one step per chat" rule still applies to Grok workers). The Project's long-lived context is for the coordinator, not a license for one worker to implement the whole feature.
+4. When a worker "figures out how to test a service", do not leave that only in Project shared context. Run `capture-learning` so it lands in a committed rule or skill and can be harvested.
+5. You (or a different model) run `code-review` on each PR. The coordinator bringing work "back to you to check" is the human gate, not a rubber stamp.
+6. For subscriptions (Slack bugs, CI red, schedule): allow only work the constitution already permits unattended. Do not subscribe a Project to auto-fix auth, payments, production, or destructive migrations.
+
+**Do not.** Put kit rules only in Project shared context (install and harvest will not see them). Treat "thousands of subagents" as a waiver of the five-file / one-subsystem step size. Let the coordinator merge its own PRs after it implemented them.
 
 ## Testing setup for Expo / EAS + Neon iOS apps
 

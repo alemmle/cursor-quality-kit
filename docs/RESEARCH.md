@@ -34,7 +34,7 @@ Sources: [Best practices](https://developers.openai.com/codex/learn/best-practic
 
 ### Cursor
 
-Sources: [Rules](https://cursor.com/docs/context/rules), [Hooks](https://cursor.com/docs/agent/hooks), [Third-party hooks](https://cursor.com/docs/reference/third-party-hooks).
+Sources: [Rules](https://cursor.com/docs/context/rules), [Hooks](https://cursor.com/docs/agent/hooks), [Third-party hooks](https://cursor.com/docs/reference/third-party-hooks), [Projects](https://cursor.com/docs/agent/projects) (checked 2026-10-03).
 
 | Recommendation | In the kit |
 | --- | --- |
@@ -45,6 +45,7 @@ Sources: [Rules](https://cursor.com/docs/context/rules), [Hooks](https://cursor.
 | `stop` hook with `followup_message` re-prompts the agent (default `loop_limit` 5). `beforeShellExecution` can deny commands; exit code 2 means deny | `.cursor/hooks.json` |
 | Cloud agents run project hooks from `.cursor/hooks.json`, not user hooks | Hooks are committed per repository |
 | Cursor also loads `.claude/settings.json` hooks (on by default), and `Stop` fires for internal sessions too | `agent-hook.sh --format claude` ignores payloads with `cursor_version`, so nothing runs twice |
+| Projects: a coordinator plans and delegates; shared context syncs across cloud and local agents; subscriptions act without a prompt | Constitution Art. 1 (shared context is scratch), Art. 3.4 / `orchestrate-workers` (coordinator is an orchestrator), Art. 7 (coordinator is not the reviewer), Art. 13 (subscription is not human approval), Art. 14 (Projects are tool defaults). Installed skill `cursor-project`; human how-to in `docs/GROK-PLAYBOOK.md`. Not a MUST to use Projects: the kit is tool-agnostic |
 
 ### AGENTS.md and Spec Kit
 
@@ -63,5 +64,6 @@ Sources: [Rules](https://cursor.com/docs/context/rules), [Hooks](https://cursor.
 ## Not adopted (yet)
 
 - **Cursor plugin packaging** of rules and skills. It would let any repository install the rules from Customize without the installer, but it only covers Cursor and does not install the gate, guard, or CI. Revisit if the rules need to reach repositories that cannot run the installer.
+- **Requiring Cursor Projects.** They are Cursor-only, beta-shaped, and unavailable under Privacy Mode (Legacy). The constitution describes the coordinator/shared-context/unattended behaviors in tool-agnostic language instead.
 - **Prompt-based or agent-based `Stop` hooks** (an LLM judges whether the work is done). They are not deterministic, and Cursor cloud agents run command hooks only.
 - **Mutation testing as a required gate.** It is slow on a whole app; the playbook recommends running it on the changed files.

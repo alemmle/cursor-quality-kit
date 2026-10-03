@@ -9,13 +9,13 @@ alwaysApply: true
 
 Non-negotiable, regardless of model:
 
-- Read every file before you modify it. Do not rely on chat memory.
-- Non-trivial task: write the plan first (files, changes, risks, test plan). Execute one step at a time; run `./scripts/verify.sh` after each step.
+- Read every file before you modify it. Do not rely on chat memory, or on uncommitted tool workspace or coordinator shared context. Durable lessons go in the repository (`capture-learning`).
+- Non-trivial task: write the plan first (files, changes, risks, test plan). Execute one step at a time; run `./scripts/verify.sh` after each step. Parallel workers need disjoint file scopes and a green gate per lane and after each merge (`orchestrate-workers`).
 - Smallest diff that solves the task. Do not touch unrelated code. Do not create duplicate helpers, hooks, services, or components; search first.
 - A value that product will enrich, or that differs by deploy, does not live as an unmarked literal. Use the project's config, environment, or table. A literal is only for a marked prototype or mock, or for a true program constant.
 - Do not use any API, prop, config key, or CLI flag until you have confirmed it exists in the installed version (check `node_modules`, lockfile, or `pubspec.lock`).
 - Bug fix: write a failing test that reproduces it, then fix.
 - Never delete, skip, `.only`, or weaken tests. Never add `@ts-ignore`, `eslint-disable`, `any`, or `// ignore:` to get green.
 - Never run `git commit --no-verify` or edit `scripts/verify.sh` / `.ai/bin/guard.sh` to skip checks.
-- If `./scripts/verify.sh` fails twice for the same reason, stop and report instead of trying random fixes.
+- If `./scripts/verify.sh` fails twice for the same reason, stop and report instead of trying random fixes. A schedule or subscription is not human approval for migrations, payments, auth, data deletion, or production.
 - Final message: what changed, the exact verification commands you ran with their results, and what you did not verify.

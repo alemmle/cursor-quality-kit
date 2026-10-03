@@ -94,3 +94,5 @@ Do this on every computer that commits to the app. Do not add `--global`.
 ## What works without this local command
 
 Cursor reads `AGENTS.md`, `.cursor/rules`, and the skills from GitHub. A session started from your phone uses a fresh cloud clone of the repository, so those files apply there too. The git pre-commit hook does not run in that clone, because `core.hooksPath` was set only on your Mac. The in-chat checks in `.cursor/hooks.json` do run, because that file is part of the repository.
+
+If you use a [Cursor Project](https://cursor.com/docs/agent/projects) on that repository, the coordinator and its cloud agents clone the same files, including the `cursor-project` skill. The constitution still applies; the Project is not a second source of truth. Human how-to: `docs/GROK-PLAYBOOK.md` (Working with Cursor Projects).

@@ -5,7 +5,7 @@ description: Write a verifiable step-by-step plan before any change that touches
 
 # Plan a small, verifiable change
 
-Use this before editing code for any task that is not a single-file fix.
+Use this before editing code for any task that is not a single-file fix. If you are coordinating other agents (including a Cursor Project coordinator), write this plan first, then dispatch with `orchestrate-workers` (and `cursor-project` when you are that coordinator). Do not skip the plan because the tool can run many agents in parallel.
 
 ## 1. Ground yourself in the repository
 

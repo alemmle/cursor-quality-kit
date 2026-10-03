@@ -5,7 +5,7 @@ description: Review a diff or pull request against the shared acceptance criteri
 
 # Code-review protocol
 
-The reviewer must not be the author: use a human or a different model than the one that wrote the change. Review the diff, not the description.
+The reviewer must not be the author: use a human or a different model than the one that wrote the change. An orchestrator or coordinator that planned or delegated the change is not a different reviewer of that change. Review the diff, not the description.
 
 ## 1. Collect facts first
 

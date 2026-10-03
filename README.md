@@ -117,7 +117,7 @@ Change `CONSTITUTION.md`, rules, or skills here, bump `VERSION`, tag a release, 
 
 | Tool | Reads |
 | --- | --- |
-| Cursor | `AGENTS.md`, `.cursor/rules/*.mdc`, `.claude/skills/` |
+| Cursor | `AGENTS.md`, `.cursor/rules/*.mdc`, `.claude/skills/` (a Cursor Project coordinator reads the same files from the cloud clone; shared context is scratch until committed) |
 | Claude Code | `CLAUDE.md` (which imports `AGENTS.md` and the constitution), `.claude/skills/` |
 | OpenAI Codex, Jules, Amp, Windsurf, Zed, and other `AGENTS.md`-aware tools | `AGENTS.md` |
 | GitHub Copilot | `.github/copilot-instructions.md`, `AGENTS.md` |
@@ -162,7 +162,7 @@ core/                      installed in every repository
   githooks/                pre-commit, pre-push
   skills/                  plan-small-change, fix-bug-with-regression-test, verify-before-done,
                            debugging-protocol, code-review, ai-regression-protocol, orchestrate-workers,
-                           capture-learning
+                           capture-learning, cursor-project
   templates/               PROJECT_STATE.md, PR template, generic verify.sh and workflow, agent-hooks/
 shared/                    rules, skills, templates reused by several stacks (stack.conf picks them)
 stacks/<stack>/            stack.conf, AGENTS section, Cursor rules, skills, project templates

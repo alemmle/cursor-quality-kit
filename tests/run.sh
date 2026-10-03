@@ -55,6 +55,13 @@ for stack in none expo-eas-neon flutter backend; do
   expect "$stack: exactly one managed block" test "$(grep -c 'quality-kit:begin' "$repo/AGENTS.md")" = "1"
 done
 
+repo="$work/install-none"
+expect "none: cursor-project skill installed" test -f "$repo/.claude/skills/cursor-project/SKILL.md"
+# shellcheck disable=SC2016 # literal backticks
+expect "none: cursor-project listed in AGENTS.md" grep -qF -- '- `cursor-project` -' "$repo/AGENTS.md"
+expect "none: constitution binds coordinator shared context" grep -q 'uncommitted tool workspace or coordinator shared context' "$repo/.ai/CONSTITUTION.md"
+expect "none: constitution treats a subscription as not approval" grep -q 'A schedule, a chat or pull-request subscription' "$repo/.ai/CONSTITUTION.md"
+
 repo="$work/install-backend"
 expect "backend: shared neon rule installed" test -f "$repo/.cursor/rules/qk-11-neon-postgres.mdc"
 expect "backend: shared neon skill installed" test -f "$repo/.claude/skills/neon-schema-change/SKILL.md"
