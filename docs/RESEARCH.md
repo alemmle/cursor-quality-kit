@@ -1,6 +1,6 @@
 # Research: what the vendors and the literature recommend
 
-Collected 2026-10-02. Each finding lists what the kit does with it. Re-check the sources when a tool's major version changes.
+Collected 2026-10-02. Each finding lists what the kit does with it. Re-check the sources when a tool's major version changes. DORA catalog vs this kit: [DORA-FIT-GAP.md](DORA-FIT-GAP.md) (2026-10-04).
 
 ## Vendor guidance
 

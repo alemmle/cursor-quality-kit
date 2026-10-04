@@ -7,7 +7,7 @@ Rules and skills raise the floor, but they do not make two models equally capabl
 3. **Deterministic gates** (`scripts/verify.sh`, `.ai/bin/guard.sh`, agent hooks, git hooks): fail the change, whatever model wrote it. The agent hooks act inside the chat: when Grok says "done", Cursor runs the gate and sends it back with the failure output.
 4. **CI** (reusable workflows + required checks): the final authority, and it runs the central copy of the guard that a PR cannot edit.
 
-The vendor guidance and research behind this are summarized in [RESEARCH.md](RESEARCH.md).
+The vendor guidance and research behind this are summarized in [RESEARCH.md](RESEARCH.md). How DORA's catalog maps to this kit: [DORA-FIT-GAP.md](DORA-FIT-GAP.md).
 
 ## Failure modes and the control that catches each
 

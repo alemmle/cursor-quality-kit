@@ -11,7 +11,7 @@ Stack packs:
 - `backend`: TypeScript Node API backed by Neon Postgres
 - `none`: constitution, guard, and hooks only (add your own `scripts/verify.sh` checks)
 
-Why this exists and how to use it with Grok: [docs/GROK-PLAYBOOK.md](docs/GROK-PLAYBOOK.md).
+Why this exists and how to use it with Grok: [docs/GROK-PLAYBOOK.md](docs/GROK-PLAYBOOK.md). DORA fit-gap: [docs/DORA-FIT-GAP.md](docs/DORA-FIT-GAP.md).
 
 ## What gets installed in a repository
 
