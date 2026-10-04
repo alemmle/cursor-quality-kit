@@ -2,6 +2,13 @@
 
 Versioning policy: [docs/VERSIONING.md](docs/VERSIONING.md).
 
+## 1.9.0
+
+Higher pull-request size ceiling.
+
+- Constitution Article 2.3: a plan step is still at most 5 files and one subsystem. The mechanical diff review rejects the pull request as a whole above 80 files or 2500 changed lines (was 25 and 800). A larger pull request needs `ai-large-diff-approved`.
+- `diff-review.sh` and the reusable constitution workflow use those defaults. A caller that sets `max-files` or `max-lines`, or that sets `DIFF_MAX_FILES` and `DIFF_MAX_LINES` in its own workflow, keeps the old ceiling until that pin is removed.
+
 ## 1.8.0
 
 Grammar of user-facing text.
