@@ -5,6 +5,8 @@ description: Prepare and ship iOS builds and OTA updates with EAS Build, EAS Sub
 
 # EAS build and release (iOS)
 
+This is the Expo procedure for constitution Article 18. A release still needs a human ask in the current task, a green commit, and this existing path — do not add another.
+
 ## Decide: new binary or OTA update?
 
 A new binary (EAS Build + Submit) is required when the change touches anything native: new or upgraded native packages, config plugins, `ios.infoPlist`, entitlements, app icon/splash, Expo SDK upgrade. Only JavaScript and asset changes can ship as an EAS Update.

@@ -1,0 +1,19 @@
+---
+description: Keep markdown and rules true of the committed code when tokens are removed or renamed
+alwaysApply: true
+---
+
+# Documentation matches the code
+
+Markdown that states a fact about this repository (a command, flag, path, identifier, environment variable, config key, API, or architecture claim) must stay true of the committed code. Agents read those files as ground truth.
+
+When you remove, rename, or change the meaning of such a token:
+
+- Search `*.md`, `*.mdc`, and the managed instruction files for the old token. Follow `sync-docs-from-diff`.
+- Read each hit. If the sentence is no longer true, update the file in the same change.
+- A changelog entry, a quote of the old name, or an example of what was removed can stay. Say so in the completion report.
+- Do not leave `AGENTS.md`, `docs/PROJECT_STATE.md`, skills, or rules describing a command, path, or API you deleted or renamed.
+
+Do not treat file age as the check. A year-old page can be accurate; a week-old page can already name a deleted flag.
+
+Review judges this rule (`code-review`). The regression guard does not parse markdown for stale tokens.

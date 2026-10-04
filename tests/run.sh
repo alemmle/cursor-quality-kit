@@ -62,6 +62,9 @@ expect "none: cursor-project listed in AGENTS.md" grep -qF -- '- `cursor-project
 expect "none: constitution binds coordinator shared context" grep -q 'uncommitted tool workspace or coordinator shared context' "$repo/.ai/CONSTITUTION.md"
 expect "none: constitution treats a subscription as not approval" grep -q 'A schedule, a chat or pull-request subscription' "$repo/.ai/CONSTITUTION.md"
 expect "none: constitution requires a grammar check" grep -q 'Article 15 - User-facing language' "$repo/.ai/CONSTITUTION.md"
+expect "none: constitution requires docs to match the code" grep -q 'Article 16 - Documentation matches the code' "$repo/.ai/CONSTITUTION.md"
+expect "none: constitution requires blast radius and reversibility" grep -q 'Article 17 - Blast radius and reversibility' "$repo/.ai/CONSTITUTION.md"
+expect "none: constitution requires change and release" grep -q 'Article 18 - Change and release' "$repo/.ai/CONSTITUTION.md"
 expect "none: constitution names the pull-request file ceiling" grep -q 'more than 80 files' "$repo/.ai/CONSTITUTION.md"
 expect "none: constitution names the pull-request line ceiling" grep -q 'more than 2500 lines' "$repo/.ai/CONSTITUTION.md"
 expect "diff-review default file ceiling is 80" grep -q 'DIFF_MAX_FILES:-80' "$KIT/core/bin/diff-review.sh"
@@ -73,6 +76,24 @@ expect "none: grammar rule always applies" grep -qx 'alwaysApply: true' "$repo/.
 expect "none: grammar rule checks singular and plural" grep -q '0, 1, and 2' "$repo/.cursor/rules/qk-06-grammar.mdc"
 expect "none: copilot grammar rule applies everywhere" grep -qx 'applyTo: "\*\*"' "$repo/.github/instructions/qk-06-grammar.instructions.md"
 expect "none: agents summary names the grammar check" grep -q 'grammar-checked as the user sees it' "$repo/AGENTS.md"
+expect "none: docs-sync rule installed" test -f "$repo/.cursor/rules/qk-07-docs-sync.mdc"
+expect "none: docs-sync rule always applies" grep -qx 'alwaysApply: true' "$repo/.cursor/rules/qk-07-docs-sync.mdc"
+expect "none: blast-radius rule installed" test -f "$repo/.cursor/rules/qk-08-blast-radius.mdc"
+expect "none: blast-radius rule always applies" grep -qx 'alwaysApply: true' "$repo/.cursor/rules/qk-08-blast-radius.mdc"
+expect "none: sync-docs-from-diff skill installed" test -f "$repo/.claude/skills/sync-docs-from-diff/SKILL.md"
+expect "none: assess-blast-radius skill installed" test -f "$repo/.claude/skills/assess-blast-radius/SKILL.md"
+# shellcheck disable=SC2016 # literal backticks
+expect "none: sync-docs-from-diff listed in AGENTS.md" grep -qF -- '- `sync-docs-from-diff` -' "$repo/AGENTS.md"
+# shellcheck disable=SC2016 # literal backticks
+expect "none: assess-blast-radius listed in AGENTS.md" grep -qF -- '- `assess-blast-radius` -' "$repo/AGENTS.md"
+expect "none: agents summary names the docs-sync check" grep -q 'searched and updated in the same change' "$repo/AGENTS.md"
+expect "none: agents summary names blast radius" grep -q 'plan names blast radius' "$repo/AGENTS.md"
+expect "none: change-release rule installed" test -f "$repo/.cursor/rules/qk-09-change-release.mdc"
+expect "none: change-release rule always applies" grep -qx 'alwaysApply: true' "$repo/.cursor/rules/qk-09-change-release.mdc"
+expect "none: change-and-release skill installed" test -f "$repo/.claude/skills/change-and-release/SKILL.md"
+# shellcheck disable=SC2016 # literal backticks
+expect "none: change-and-release listed in AGENTS.md" grep -qF -- '- `change-and-release` -' "$repo/AGENTS.md"
+expect "none: agents summary names change vs release" grep -q 'release to users needs a human ask' "$repo/AGENTS.md"
 
 repo="$work/install-backend"
 expect "backend: shared neon rule installed" test -f "$repo/.cursor/rules/qk-11-neon-postgres.mdc"
@@ -82,6 +103,9 @@ expect "backend: no expo rules" test ! -e "$repo/.cursor/rules/qk-10-expo-react-
 repo="$work/install-flutter"
 expect "flutter: no typescript rule" test ! -e "$repo/.cursor/rules/qk-05-typescript.mdc"
 expect "flutter: grammar rule installed" test -f "$repo/.cursor/rules/qk-06-grammar.mdc"
+expect "flutter: docs-sync rule installed" test -f "$repo/.cursor/rules/qk-07-docs-sync.mdc"
+expect "flutter: blast-radius rule installed" test -f "$repo/.cursor/rules/qk-08-blast-radius.mdc"
+expect "flutter: change-release rule installed" test -f "$repo/.cursor/rules/qk-09-change-release.mdc"
 
 repo="$(new_repo eas)"
 printf '{ "build": { "production": {} } }\n' >"$repo/eas.json"
@@ -240,10 +264,10 @@ hook() { # hook <payload> <args...>
 }
 shell_cmd() { printf '{"command":"%s","cursor_version":"3"}' "$1"; }
 for c in 'git commit --no-verify -m x' 'GUARD_ALLOW_GATE_CHANGES=1 git commit -m x' 'git config core.hooksPath /dev/null' \
-  'git push --force origin main' 'git push origin +main' 'npx eas submit -p ios' 'eas update --branch production' 'neonctl branches delete dev'; do
+  'git push --force origin main' 'git push origin +main' 'git push origin main' 'git push origin HEAD:main' 'npx eas submit -p ios' 'eas update --branch production' 'neonctl branches delete dev'; do
   expect_fail "pre-shell blocks: $c" 'Blocked by' hook "$(shell_cmd "$c")" pre-shell
 done
-for c in 'git push -u origin feature' 'npm test' 'eas update --branch preview' 'git commit -m "fix: x"'; do
+for c in 'git push -u origin feature' 'git push origin main-feature' 'npm test' 'eas update --branch preview' 'git commit -m "fix: x"'; do
   expect "pre-shell allows: $c" hook "$(shell_cmd "$c")" pre-shell
 done
 expect "pre-shell: claude format skips Cursor payloads (no double run)" hook "$(shell_cmd 'git commit --no-verify')" pre-shell --format claude

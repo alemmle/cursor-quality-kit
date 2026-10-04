@@ -13,5 +13,5 @@ alwaysApply: false
 - Secrets go in `env:` on the step or job that uses them, never at workflow level. Never print them, and never run pull request code with secrets (`pull_request_target` plus a checkout of the PR head).
 - Actions from `actions/*` and other reviewed publishers may use a major tag; any other publisher is pinned to a full commit SHA.
 - Use `concurrency` so a new push cancels the superseded pull request run; keep runs on the default branch so every merged commit has a result.
-- Release and deploy jobs run on manual dispatch or tags, only from a commit whose gate is green. Never deploy from an artifact built by an unverified run.
+- Release and deploy jobs run on manual dispatch or tags, only from a commit whose gate is green. Never deploy from an artifact built by an unverified run. That is the workflow side of constitution Article 18: a release is not a code change, and it uses this path, not a second one.
 - macOS runners bill at 10x Linux minutes on private repositories. Run macOS jobs only where the check needs macOS (iOS builds), not on every push.

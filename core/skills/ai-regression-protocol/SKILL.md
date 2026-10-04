@@ -36,7 +36,7 @@ Append one row to `docs/AI_REGRESSIONS.md` (create it with this header if missin
 | --- | --- | --- | --- | --- | --- | --- |
 ```
 
-Categories: `invented-api`, `stale-version-api`, `scope-creep`, `missing-test`, `weakened-test`, `state/async`, `navigation`, `native-config`, `data/migration`, `security`, `other`.
+Categories: `invented-api`, `stale-version-api`, `scope-creep`, `stale-docs`, `blast-radius`, `missing-test`, `weakened-test`, `state/async`, `navigation`, `native-config`, `data/migration`, `security`, `other`.
 
 ## 5. Strengthen the gate
 
