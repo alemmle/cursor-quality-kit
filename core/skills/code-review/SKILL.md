@@ -32,6 +32,7 @@ Read the task/issue and the plan. For each changed file answer:
 8. **Mobile specifics?** Native changes flagged as needing a new build; OTA safety; loading/empty/error states; accessibility labels and `testID`s.
 9. **Report honest?** The author's "verified" claims match CI output.
 10. **Parametric values?** A new literal that product will enrich, or that differs by deploy, is a blocker unless the file or pull request marks it as a prototype or mock, it is a true program constant (protocol field, status code, type discriminant), or the pull request states why it stays in source (Article 9). Do not flag those constants. Secrets stay under the security check.
+11. **Grammar?** User-facing text in a language in scope was read as the user sees or hears it (Article 15). A dynamic value combined with words, especially a count, was checked for agreement at 0, 1, and 2 and for every other number category that language uses. Concatenating a number and a fixed noun, or a test that only asserts a key exists, is a blocker.
 
 ## 3. Verdict
 

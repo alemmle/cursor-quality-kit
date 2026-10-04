@@ -13,15 +13,17 @@ description: Run the verification gate and produce an honest completion report. 
    - No debug logging, commented-out code, or leftover TODOs you introduced.
    - No new duplicate of an existing helper or component.
    - New files are referenced and used.
-5. If you changed behavior, setup, or architecture, update `AGENTS.md` and/or `docs/PROJECT_STATE.md`.
-6. Write the completion report:
+5. If you added or changed user-facing text, grammar-check each language in scope (the grammar rule). For a string that mixes a dynamic value with words, read the rendered combinations. A count: 0, 1, and 2, plus any other number category that language uses. Name the languages and combinations in the report.
+6. If you changed behavior, setup, or architecture, update `AGENTS.md` and/or `docs/PROJECT_STATE.md`.
+7. Write the completion report:
 
 ```markdown
 Changed: <files and one line each>
 Verified:
 - ./scripts/verify.sh -> exit 0 (<N> tests passed)
+- grammar: <languages in scope, and the combinations read (a count at 0, 1, and 2), or "no user-facing text changed">
 - <any manual check, with device/simulator and OS>
-Not verified: <be explicit, e.g. "physical device", "EAS production build", "migration on a Neon branch">
+Not verified: <be explicit, e.g. "physical device", "EAS production build", "migration on a Neon branch", "a language in scope you did not read">
 Risks / follow-ups: <list>
 ```
 

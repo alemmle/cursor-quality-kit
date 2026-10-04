@@ -2,6 +2,13 @@
 
 Versioning policy: [docs/VERSIONING.md](docs/VERSIONING.md).
 
+## 1.8.0
+
+Grammar of user-facing text.
+
+- Constitution Article 15: languages in scope are the ones the repository names for users, or, when none are named, every language that already has user-facing strings. A change to that text includes a grammar check of the text as the user sees or hears it. A string that combines a dynamic value with words is checked as the combinations the user can see. A count is checked for singular and plural at 0, 1, and 2, and for every other number category that language uses. Phrases are not built by concatenating a value and a fixed word. Tests assert the rendered phrase for those counts.
+- New always-on rule `qk-06-grammar`. `code-review`, `verify-before-done`, and the acceptance blockers match the article. Article 13's stop condition covers every MUST in the constitution, including this one. The regression guard does not parse grammar.
+
 ## 1.7.0
 
 Coordinator and unattended-agent rules (Cursor Projects as a tool default).

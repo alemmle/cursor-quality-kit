@@ -61,6 +61,12 @@ expect "none: cursor-project skill installed" test -f "$repo/.claude/skills/curs
 expect "none: cursor-project listed in AGENTS.md" grep -qF -- '- `cursor-project` -' "$repo/AGENTS.md"
 expect "none: constitution binds coordinator shared context" grep -q 'uncommitted tool workspace or coordinator shared context' "$repo/.ai/CONSTITUTION.md"
 expect "none: constitution treats a subscription as not approval" grep -q 'A schedule, a chat or pull-request subscription' "$repo/.ai/CONSTITUTION.md"
+expect "none: constitution requires a grammar check" grep -q 'Article 15 - User-facing language' "$repo/.ai/CONSTITUTION.md"
+expect "none: grammar rule installed" test -f "$repo/.cursor/rules/qk-06-grammar.mdc"
+expect "none: grammar rule always applies" grep -qx 'alwaysApply: true' "$repo/.cursor/rules/qk-06-grammar.mdc"
+expect "none: grammar rule checks singular and plural" grep -q '0, 1, and 2' "$repo/.cursor/rules/qk-06-grammar.mdc"
+expect "none: copilot grammar rule applies everywhere" grep -qx 'applyTo: "\*\*"' "$repo/.github/instructions/qk-06-grammar.instructions.md"
+expect "none: agents summary names the grammar check" grep -q 'grammar-checked as the user sees it' "$repo/AGENTS.md"
 
 repo="$work/install-backend"
 expect "backend: shared neon rule installed" test -f "$repo/.cursor/rules/qk-11-neon-postgres.mdc"
@@ -69,6 +75,7 @@ expect "backend: shared neon workflow installed" test -f "$repo/.github/workflow
 expect "backend: no expo rules" test ! -e "$repo/.cursor/rules/qk-10-expo-react-native.mdc"
 repo="$work/install-flutter"
 expect "flutter: no typescript rule" test ! -e "$repo/.cursor/rules/qk-05-typescript.mdc"
+expect "flutter: grammar rule installed" test -f "$repo/.cursor/rules/qk-06-grammar.mdc"
 
 repo="$(new_repo eas)"
 printf '{ "build": { "production": {} } }\n' >"$repo/eas.json"

@@ -158,7 +158,7 @@ core/                      installed in every repository
   adapters/                CLAUDE.md, GEMINI.md, Copilot blocks
   ACCEPTANCE.md            acceptance criteria (same for every tool and model)
   bin/                     guard.sh, diff-review.sh, accept.sh, agent-hook.sh
-  cursor-rules/            constitution (always on), scope, security, testing, CI workflows
+  cursor-rules/            constitution (always on), scope, security, testing, CI workflows, grammar
   githooks/                pre-commit, pre-push
   skills/                  plan-small-change, fix-bug-with-regression-test, verify-before-done,
                            debugging-protocol, code-review, ai-regression-protocol, orchestrate-workers,
