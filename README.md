@@ -11,7 +11,7 @@ Stack packs:
 - `backend`: TypeScript Node API backed by Neon Postgres
 - `none`: constitution, guard, and hooks only (add your own `scripts/verify.sh` checks)
 
-Why this exists and how to use it with Grok: [docs/GROK-PLAYBOOK.md](docs/GROK-PLAYBOOK.md).
+Why this exists and how to use it with Grok: [docs/GROK-PLAYBOOK.md](docs/GROK-PLAYBOOK.md). DORA fit-gap: [docs/DORA-FIT-GAP.md](docs/DORA-FIT-GAP.md).
 
 ## What gets installed in a repository
 
@@ -177,6 +177,7 @@ scripts/harvest-pr.sh      open one kit pull request per proposal (used by harve
 scripts/rollout.sh         install the kit into every repository in rollout/ (used by rollout.yml)
 rollout/                   per repository: stack and options, superseded paths, PR notes
 docs/HOW-TO-NEW-APP.md     steps for installing the kit into a new repository
+docs/DORA-FIT-GAP.md       DORA catalog vs this kit
 tests/run.sh               self-tests for the installer and guard
 ```
 

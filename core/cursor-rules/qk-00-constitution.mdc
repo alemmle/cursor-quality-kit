@@ -13,13 +13,13 @@ Non-negotiable, regardless of model:
 - Non-trivial task: write the plan first (files, changes, blast radius, rollback, test plan). Execute one step at a time; run `./scripts/verify.sh` after each step. Parallel workers need disjoint file scopes and a green gate per lane and after each merge (`orchestrate-workers`).
 - Smallest diff that solves the task. Do not touch unrelated code. Do not create duplicate helpers, hooks, services, or components; search first.
 - Markdown that names a command, path, or API you removed or renamed is updated in the same change (`sync-docs-from-diff`). Do not leave `AGENTS.md` or `docs/PROJECT_STATE.md` describing the old name.
-- Name blast radius and how the change is reversed before you edit (`assess-blast-radius`). If the real radius is larger than the plan, or rollback is unclear for production, stored data, or a trust boundary, stop.
+- Name blast radius, how the change is reversed, and how a production failure would be detected before you edit (`assess-blast-radius`). If the real radius is larger than the plan, or rollback is unclear for production, stored data, or a trust boundary, stop.
 - Land code through a reviewed pull request. Do not push to the default branch. Do not ship to users unless a human asked for that release in the current task (`change-and-release`).
 - A value that product will enrich, or that differs by deploy, does not live as an unmarked literal. Use the project's config, environment, or table. A literal is only for a marked prototype or mock, or for a true program constant.
 - User-facing text in a language in scope is grammar-checked as the user sees it. A count combined with words is checked at 0, 1, and 2, and for every other number category that language uses. Do not concatenate a number and a fixed noun.
 - Do not use any API, prop, config key, or CLI flag until you have confirmed it exists in the installed version (check `node_modules`, lockfile, or `pubspec.lock`).
 - Bug fix: write a failing test that reproduces it, then fix.
-- Never delete, skip, `.only`, or weaken tests. Never add `@ts-ignore`, `eslint-disable`, `any`, or `// ignore:` to get green.
+- Never delete, skip, `.only`, quarantine as flaky, or weaken tests. Never add `@ts-ignore`, `eslint-disable`, `any`, or `// ignore:` to get green.
 - Never run `git commit --no-verify` or edit `scripts/verify.sh` / `.ai/bin/guard.sh` to skip checks.
-- If `./scripts/verify.sh` fails twice for the same reason, stop and report instead of trying random fixes. A schedule or subscription is not human approval for migrations, payments, auth, data deletion, production, or a release to users.
+- If `./scripts/verify.sh` fails twice for the same reason, stop and report instead of trying random fixes. If the default branch's required checks are red and the task is not to fix them, stop. A schedule or subscription is not human approval for migrations, payments, auth, data deletion, production, or a release to users.
 - Final message: what changed, the exact verification commands you ran with their results, and what you did not verify.

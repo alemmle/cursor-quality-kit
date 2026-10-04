@@ -13,6 +13,7 @@ Use this before editing code for any task that is not a single-file fix. If you 
 2. Find the code involved. Search for existing helpers, hooks, services, components, and API clients that already do part of the job. List them; you will reuse them.
 3. Open every file you expect to change and read it fully. Search for callers of any public interface in that set (`assess-blast-radius`).
 4. Note the installed versions of the libraries you will use (from the lockfile or `pubspec.lock`). Do not plan around APIs you have not confirmed exist in those versions.
+5. If `gh` is available, check that the default branch's latest required checks are green (Article 6.6). If they are red and this task is not to fix them, stop and report. If you cannot check, say so.
 
 ## 2. Write the plan
 
@@ -32,6 +33,7 @@ Blast radius:
 - Callers / dependents: <files or "none">
 - Data / production / auth / payments / native: <none or which>
 Rollback: <git revert | existing down-migration | existing feature flag | forward fix>
+Detect: <existing log/metric/crash reporter/test/store listing | none>
 Out of scope: <things you noticed but will not touch>
 Verification: ./scripts/verify.sh after every step; <manual check, e.g. iOS simulator flow>
 Stop if: <what would mean the radius is larger than this plan>

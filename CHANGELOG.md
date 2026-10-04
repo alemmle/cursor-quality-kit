@@ -2,6 +2,16 @@
 
 Versioning policy: [docs/VERSIONING.md](docs/VERSIONING.md).
 
+## 1.11.0
+
+Four DORA agent practices from the catalog fit-gap. Judged in `code-review`; the regression guard does not gain new patterns.
+
+- Constitution Article 5.3: a nondeterministic test is a defect. Agents MUST NOT quarantine or retry-until-green. Testing rule and `code-review` match.
+- Constitution Article 6.6 / 13: agents SHOULD check that the default branch's required checks are green before unrelated work; if they are red, MUST report and SHOULD NOT start a new feature until a human says to proceed.
+- Constitution Article 17.5: a production-affecting change names how a failure would be detected with a signal the project already has. Agents MUST NOT add a monitoring product to satisfy this article.
+- Security rule: if the project already runs a scanner, run it with the gate or the release; do not add a second one (`qk-02-security`).
+- Research: `docs/DORA-FIT-GAP.md` maps the 2025 AI Capabilities Model, the four key metrics, and the capability catalog onto the kit. Left out: the four metrics as measurements, monitoring products, CABs, on-demand deploys, mandatory TDD for every feature, user-research loops, and culture/leadership.
+
 ## 1.10.0
 
 Documentation matches the code, blast radius is named before a change proceeds, and change is separated from release.

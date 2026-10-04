@@ -23,14 +23,14 @@ It prints `ACCEPT` or `REJECT` and exits 0 or 1. CI runs the same stages. Stage 
 ## Blockers (always REJECT)
 
 - Any failing stage above.
-- Tests skipped, deleted, or weakened; suppressions or `any` added without a written reason.
+- Tests skipped, deleted, weakened, or quarantined as flaky; suppressions or `any` added without a written reason.
 - Secrets or privileged credentials in the diff or the app binary.
 - Edits to applied migrations, or destructive schema changes without human approval.
 - Behavior change without tests, or a bug fix without a regression test.
 - The completion report claims verification that did not happen.
 - User-facing text in a language in scope that was not grammar-checked, or a count joined to a fixed word so singular and plural cannot both be correct.
 - Markdown that still describes a command, path, flag, or API the change removed or renamed, except a changelog, quote, or example of what was removed.
-- A change that can affect production users, stored data, or a trust boundary with no named reverse path the project already has, or a blast radius larger than the plan that the author continued anyway.
+- A change that can affect production users, stored data, or a trust boundary with no named reverse path the project already has, a blast radius larger than the plan that the author continued anyway, or a production-affecting change with no named detection signal and no statement that the project has none.
 - A push to the default branch, a self-merge before Article 7 acceptance, a production release the human did not ask for, a ship from a dirty tree or a different commit than the green one, a native change shipped as a hot update, or a second release path invented for the task.
 
 ## Human overrides
