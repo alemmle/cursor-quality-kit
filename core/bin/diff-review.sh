@@ -28,8 +28,8 @@ while [ $# -gt 0 ]; do
   shift
 done
 
-max_files="${DIFF_MAX_FILES:-25}"
-max_lines="${DIFF_MAX_LINES:-800}"
+max_files="${DIFF_MAX_FILES:-80}"
+max_lines="${DIFF_MAX_LINES:-2500}"
 
 if [ -z "$base" ]; then
   base="$(git symbolic-ref -q --short refs/remotes/origin/HEAD 2>/dev/null || true)"

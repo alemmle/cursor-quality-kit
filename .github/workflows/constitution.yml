@@ -21,11 +21,11 @@ on:
       max-files:
         description: Diff review limit on changed files
         type: number
-        default: 25
+        default: 80
       max-lines:
         description: Diff review limit on changed lines
         type: number
-        default: 800
+        default: 2500
     secrets:
       kit-token:
         description: Token with read access to the kit repository (only needed if it is private)

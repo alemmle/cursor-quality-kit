@@ -21,7 +21,7 @@ The vendor guidance and research behind this are summarized in [RESEARCH.md](RES
 | Makes tests green by skipping, deleting, or weakening them | `guard.sh` blocks `.only`/`.skip`/`xit`/`skip:`, deleted test files, and edits to the gate scripts |
 | Silences the compiler (`any`, `@ts-ignore`, `eslint-disable`, `// ignore:`) | `guard.sh` blocks them unless the line carries `ai-guard: allow <reason>` |
 | Trusts a worker or coordinator report without reading the diff | Art. 3.4, `orchestrate-workers`; the `stop` hook and CI still apply to each worker |
-| Large diffs with drive-by refactors that break unrelated screens | Art. 2/3, `plan-small-change` skill (max 5 files and one subsystem per step, gate green after each step) |
+| Large diffs with drive-by refactors that break unrelated screens | Art. 2/3, `plan-small-change` skill (max 5 files and one subsystem per step, gate green after each step). The pull request as a whole is rejected above 80 files or 2500 lines unless a human applies `ai-large-diff-approved` |
 | Durable lesson lives only in a chat or a tool's shared context | Art. 1.4, `capture-learning`; harvest puts generic lessons in the kit |
 | Unattended / subscribed agent changes production, auth, or data | Art. 13: a subscription is not human approval |
 | Creates a second API client / hook / component for something that exists | Art. 2.4, "search first, reuse" in plan and feature skills |

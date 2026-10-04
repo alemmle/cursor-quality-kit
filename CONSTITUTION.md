@@ -1,6 +1,6 @@
 # AI Code Constitution
 
-Version: 1.8.0
+Version: 1.9.0
 
 This constitution binds every AI coding agent (Cursor, Claude Code, Codex, Copilot, Gemini, Windsurf, Cline, Aider, ...) and every model (Grok, Claude, GPT, Gemini, ...) working in a repository that includes it. It is model-agnostic on purpose: the rules describe observable behavior, and the important ones are enforced by scripts and CI, not by trust.
 
@@ -17,7 +17,7 @@ This constitution binds every AI coding agent (Cursor, Claude Code, Codex, Copil
 
 1. Agents MUST make the smallest change that fully solves the task.
 2. Agents MUST NOT refactor, rename, reformat, upgrade dependencies, or "clean up" code outside the task scope. Unrelated issues are reported, not fixed.
-3. A change touching more than 5 files, or more than one subsystem (UI, navigation, state, API, database, native config), MUST be split into steps per Article 3.
+3. A plan step touching more than 5 files, or more than one subsystem (UI, navigation, state, API, database, native config), MUST be split per Article 3. The pull request is still reviewed as a whole. The mechanical diff review rejects it when it changes more than 80 files or more than 2500 lines. A larger pull request needs the human label `ai-large-diff-approved`.
 4. Agents MUST NOT create a second implementation of something that already exists (service, hook, helper, component, API client). Search first; reuse or extend.
 5. Formatting-only edits to untouched files, lockfile changes without a manifest change, and files outside the declared scope are treated as unrelated changes and rejected (`.ai/bin/diff-review.sh`).
 
