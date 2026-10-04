@@ -15,6 +15,7 @@ This repository follows the AI Code Constitution in `.ai/CONSTITUTION.md` and th
 10. User-facing text in a language in scope is grammar-checked as the user sees it. A count combined with words is checked at 0, 1, and 2, and for every other number category that language uses. Do not concatenate a number and a fixed noun.
 11. Markdown that names a command, path, flag, or API you removed or renamed is searched and updated in the same change if the sentence is no longer true (`sync-docs-from-diff`).
 12. The plan names blast radius and how the change is reversed (`assess-blast-radius`). A larger radius than the plan, or unclear rollback for production, stored data, or a trust boundary, is a stop.
+13. A change lands through a reviewed pull request. A release to users needs a human ask in the current task, a green commit, and the project's existing path (`change-and-release`). Do not push to the default branch.
 
 ### Commands
 

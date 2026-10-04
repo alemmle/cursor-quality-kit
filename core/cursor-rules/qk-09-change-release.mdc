@@ -1,0 +1,19 @@
+---
+description: Land code through reviewed pull requests; ship to users only when a human asked, on a green commit, using the project's existing release path
+alwaysApply: true
+---
+
+# Change and release
+
+A change is code that lands on the default branch. A release is that code reaching users (store submit, production deploy, production OTA, production migration, publishing a package). Follow `change-and-release`.
+
+- Land a change through the project's existing review path. Do not push to the default branch. Do not merge a pull request you authored unless a human or a different model has already accepted it (Article 7). Do not skip required checks.
+- Do not release unless a human asked for that release in the current task. A schedule, a subscription, or a green gate is not that ask.
+- Release a git commit whose `./scripts/verify.sh` is green on that commit. Do not ship from an uncommitted or dirty tree, or from an artifact built from a different commit.
+- Use the project's existing release path (workflow, profile, tag script, store channel). Do not add a second one. A native or binary change does not ship as a hot update the installed client cannot load.
+- When the project promotes through environments, promote the same commit (and the same artifact if it builds one). Do not rebuild for production from a later commit than preview or staging.
+- Use the project's existing version records (`CHANGELOG.md`, `VERSION`, app version, build number, `docs/PROJECT_STATE.md`). Do not invent a second scheme. If the project keeps a changelog, a user-visible behavior change includes an entry in the same pull request.
+- A release pull request is only the release. Do not mix unrelated feature work into it.
+- After a release, record version, build, channel or environment, and git SHA in `docs/PROJECT_STATE.md`. Say what was verified on the target environment and what was not.
+
+The `pre-shell` hook blocks App Store submit, production OTA, and pushes to the default branch. Review judges the rest (`code-review`). The regression guard does not detect a release.

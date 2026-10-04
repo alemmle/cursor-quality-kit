@@ -143,7 +143,7 @@ It blocks focused/skipped tests (Jest, Dart, pytest), suppressions (`@ts-ignore`
 Git hooks only run at commit time. Agent hooks run inside the chat, so an agent cannot stop with a red gate. `.ai/bin/agent-hook.sh` is one script for all three tools:
 
 - `stop`: when the agent tries to finish and the code changed, runs `./scripts/verify.sh`. If the gate fails, the agent is sent back with the last 40 lines of output (Cursor `followup_message`; Claude Code and Codex `decision: "block"`). After 3 failed attempts (`AI_HOOK_STOP_MAX`) it lets the agent stop and report honestly instead of looping. Green results are cached per tree state.
-- `pre-shell`: blocks `--no-verify`, `GUARD_ALLOW_*` / `DIFF_ALLOW_*` / `HUSKY=0`, `core.hooksPath`, force-push, `eas submit`, production `eas update`, `neonctl branches delete|reset`, and `DROP`/`TRUNCATE` statements typed into a shell.
+- `pre-shell`: blocks `--no-verify`, `GUARD_ALLOW_*` / `DIFF_ALLOW_*` / `HUSKY=0`, `core.hooksPath`, force-push, pushes to the default branch, `eas submit`, production `eas update`, `neonctl branches delete|reset`, and `DROP`/`TRUNCATE` statements typed into a shell.
 
 Cursor also reads `.claude/settings.json`; the Claude-format entries ignore Cursor payloads so each hook runs once. Humans working in their own terminal are not affected. `AI_HOOK_DISABLE=1` turns the hooks off.
 
@@ -162,7 +162,8 @@ core/                      installed in every repository
   githooks/                pre-commit, pre-push
   skills/                  plan-small-change, fix-bug-with-regression-test, verify-before-done,
                            debugging-protocol, code-review, ai-regression-protocol, orchestrate-workers,
-                           capture-learning, cursor-project, sync-docs-from-diff, assess-blast-radius
+                           capture-learning, cursor-project, sync-docs-from-diff, assess-blast-radius,
+                           change-and-release
   templates/               PROJECT_STATE.md, PR template, generic verify.sh and workflow, agent-hooks/
 shared/                    rules, skills, templates reused by several stacks (stack.conf picks them)
 stacks/<stack>/            stack.conf, AGENTS section, Cursor rules, skills, project templates

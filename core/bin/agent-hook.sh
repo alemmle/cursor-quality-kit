@@ -57,8 +57,10 @@ pre_shell() {
     reason="Changing core.hooksPath disables the git hooks (constitution Art. 6.3)."
   elif printf '%s' "$payload" | grep -Eq 'git[^"]*[[:space:]]push[^"]*([[:space:]]--force|[[:space:]]-f([[:space:]"]|$)|[[:space:]][+][A-Za-z0-9_./-]+)'; then
     reason="Force-pushing rewrites history and needs explicit human approval (constitution Art. 8.2)."
+  elif printf '%s' "$payload" | grep -Eq 'git[^"]*[[:space:]]push[^"]*((origin|upstream)[[:space:]]+)?(HEAD:)?(main|master|production)([[:space:]"'\'']|$)'; then
+    reason="Pushing to the default branch skips the review path (constitution Art. 18.1). Open a pull request instead."
   elif printf '%s' "$payload" | grep -Eq '(eas|eas-cli)[[:space:]]+submit|(eas|eas-cli)[[:space:]]+update[^"]*(--branch|--channel)[= ]+production'; then
-    reason="Submitting to the App Store or publishing a production OTA update needs explicit human approval (constitution Art. 8.3)."
+    reason="Submitting to the App Store or publishing a production OTA update is a release and needs a human ask in the current task (constitution Art. 18.2)."
   elif printf '%s' "$payload" | grep -Eq '(neonctl|neon)[[:space:]]+(branches|branch)[[:space:]]+(delete|reset)|(DROP|TRUNCATE)[[:space:]]+(TABLE|SCHEMA|DATABASE)'; then
     reason="Destructive database operations need explicit human approval (constitution Art. 8.2)."
   fi

@@ -52,10 +52,11 @@ Do not reimplement these as prose-only checks:
 
 | Mechanism | What it blocks |
 | --- | --- |
-| `.ai/bin/agent-hook.sh` `pre-shell` | `--no-verify`, guard overrides, force-push, production EAS, destructive Neon/SQL |
+| `.ai/bin/agent-hook.sh` `pre-shell` | `--no-verify`, guard overrides, force-push, push to default branch, production EAS, destructive Neon/SQL |
 | `.ai/bin/guard.sh` | secrets, skipped tests, gate-file edits, applied-migration edits |
 | Article 8 | production data, editing applied migrations |
 | Article 13 | payments, authentication, data deletion, production infrastructure |
+| Article 18 / `change-and-release` | push to default branch, store submit, production OTA; other releases by the human ask |
 
 This skill names radius and rollback **before** those hooks fire, and stops when the plan was wrong.
 

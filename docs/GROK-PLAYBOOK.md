@@ -15,7 +15,7 @@ The vendor guidance and research behind this are summarized in [RESEARCH.md](RES
 | --- | --- |
 | Uses APIs from an older Expo SDK / React Native / library version | Constitution Art. 4, Expo rule "read the installed version", `expo install --check`, `expo-doctor`, `tsc` |
 | Says "done, tests pass" without running them | Art. 6 + `verify-before-done` skill; the `stop` agent hook runs the gate and re-prompts on failure; `pre-push` and CI run it again |
-| Commits with `--no-verify`, sets `GUARD_ALLOW_*` itself, force-pushes, runs `eas submit`, deletes a Neon branch | `pre-shell` agent hook blocks the command before it runs |
+| Commits with `--no-verify`, sets `GUARD_ALLOW_*` itself, force-pushes, pushes to `main`, runs `eas submit`, deletes a Neon branch | `pre-shell` agent hook blocks the command before it runs |
 | Makes a test pass by branching on the test input or hardcoding the expected value | Art. 5.6, testing rule; review by a different model; mutation testing (below) |
 | A test contradicts the task and the agent "fixes" whichever side is easier | Art. 5.7: stop and quote both |
 | Makes tests green by skipping, deleting, or weakening them | `guard.sh` blocks `.only`/`.skip`/`xit`/`skip:`, deleted test files, and edits to the gate scripts |
@@ -23,7 +23,7 @@ The vendor guidance and research behind this are summarized in [RESEARCH.md](RES
 | Trusts a worker or coordinator report without reading the diff | Art. 3.4, `orchestrate-workers`; the `stop` hook and CI still apply to each worker |
 | Large diffs with drive-by refactors that break unrelated screens | Art. 2/3, `plan-small-change` skill (max 5 files and one subsystem per step, gate green after each step). The pull request as a whole is rejected above 80 files or 2500 lines unless a human applies `ai-large-diff-approved` |
 | Durable lesson lives only in a chat or a tool's shared context | Art. 1.4, `capture-learning`; harvest puts generic lessons in the kit |
-| Unattended / subscribed agent changes production, auth, or data | Art. 13: a subscription is not human approval |
+| Unattended / subscribed agent changes production, auth, data, or ships a release | Art. 13: a subscription is not human approval; Art. 18.2: a release needs a human ask in the current task |
 | Creates a second API client / hook / component for something that exists | Art. 2.4, "search first, reuse" in plan and feature skills |
 | Fixes symptoms; the same bug comes back | `fix-bug-with-regression-test` skill: failing test first, root cause written down |
 | Puts the Neon connection string or secrets in the app | Expo/Neon rules, `guard.sh` secret and `EXPO_PUBLIC_*` checks |
@@ -31,8 +31,9 @@ The vendor guidance and research behind this are summarized in [RESEARCH.md](RES
 | Ships "1 items", "0 item", or another broken combination of a dynamic value and words | Art. 15, grammar rule; `code-review` asks. The guard does not parse grammar |
 | Leaves `AGENTS.md` or a skill naming a command, path, or API the change deleted | Art. 16, `qk-07-docs-sync`, `sync-docs-from-diff`. The guard does not parse markdown for stale tokens |
 | Keeps implementing after extra callers or an irreversible migration show up | Art. 17, `qk-08-blast-radius`, `assess-blast-radius`, Art. 13 stop. Destructive shells stay blocked by the `pre-shell` hook. The guard does not compute blast radius |
+| Pushes to `main`, self-merges, or ships to users without a human ask | Art. 18, `qk-09-change-release`, `change-and-release`. The `pre-shell` hook blocks pushes to the default branch, `eas submit`, and production OTA. The guard does not detect a release |
 | Edits an applied migration or drops columns that shipped apps still use | `neon-schema-change` skill (expand, then contract), guard blocks edits to existing migration files, per-PR Neon branch |
-| Ships an OTA update that needs native code | `eas-build-and-release` skill (runtime version / fingerprint policy) |
+| Ships an OTA update that needs native code | Art. 18.4, `eas-build-and-release` skill (runtime version / fingerprint policy) |
 | Screen works in Jest but is broken on iOS | Maestro flows on an EAS simulator build (`.eas/workflows/e2e-test-ios.yml`) |
 
 ## Working with Grok in Cursor

@@ -35,6 +35,7 @@
 - [ ] User-facing text in each language in scope was grammar-checked; a count combined with words was read at 0, 1, and 2 (and the language's other number categories)
 - [ ] Markdown was searched for tokens this change removed or renamed; stale instructions were updated
 - [ ] Blast radius and rollback are named; work stopped if the radius grew or rollback was unclear
+- [ ] Not a push to the default branch; a release to users was asked for, is a green commit, and uses the project's existing path
 - [ ] Migrations are new files and backward compatible with the shipped app
 - [ ] Native changes flagged (need a new build, not an OTA update)
 - [ ] `AGENTS.md` / `docs/PROJECT_STATE.md` updated if behavior or setup changed

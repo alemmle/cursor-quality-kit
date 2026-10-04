@@ -83,6 +83,19 @@ Sources: [AWS Well-Architected OPS06-BP01](https://docs.aws.amazon.com/wellarchi
 | Stop and re-evaluate when rollback is unclear or the change is larger than planned | Article 17.2 / 17.4 and Article 13 |
 | Programmatic enforcement of destructive operations | Existing `pre-shell` hook (Article 6.5). Not an LLM that scores blast radius |
 
+## Change and release (2026-10-04)
+
+Sources: [DORA: Streamlining change approval](https://dora.dev/capabilities/streamlining-change-approval/) (last updated 2025-10-30, fetched 2026-10-04), [AWS Well-Architected OPS06-BP01](https://docs.aws.amazon.com/wellarchitected/latest/framework/ops_mit_deploy_risks_plan_for_unsucessful_changes.html), promote-the-same-artifact release engineering (build once, inject config at runtime).
+
+| Finding | In the kit |
+| --- | --- |
+| Change approval is peer review plus automated detection, not an external CAB. DORA found no evidence that a more formal external review lowers change-fail rate, and it increases batch size | Article 7 (human or different model), Article 18.1 (pull request, no push to the default branch). No CAB article |
+| Segregation of duties: someone other than the author accepts the change | Article 7.3 / 18.1: the author does not merge until that acceptance exists |
+| Communicate a single path from submitted to accepted | `change-and-release` skill; `qk-09-change-release`; CI rule that release jobs run on tags/dispatch from a green commit (`qk-04-ci-workflows`) |
+| Release/deploy is a different control surface from authorizing the change | Article 18 splits change (lands on default branch) from release (reaches users). Human ask required for a release |
+| Promote the same commit/artifact; do not rebuild for production | Article 18.3 and 18.5 |
+| Plan for unsuccessful changes | Article 17 plus 18.8 (record what shipped; rollback is the reverse path already named) |
+
 ## Not adopted (yet)
 
 - **Cursor plugin packaging** of rules and skills. It would let any repository install the rules from Customize without the installer, but it only covers Cursor and does not install the gate, guard, or CI. Revisit if the rules need to reach repositories that cannot run the installer.
@@ -91,3 +104,6 @@ Sources: [AWS Well-Architected OPS06-BP01](https://docs.aws.amazon.com/wellarchi
 - **Mutation testing as a required gate.** It is slow on a whole app; the playbook recommends running it on the changed files.
 - **A Python/Node documentation-drift gate in `core/`.** Symbol-level drift is a real defect (Article 16), but the portable core stays bash. A CI fail on every leftover token would also reject true changelog and quote hits.
 - **Requiring feature flags or canaries in every repository.** Correct where the platform exists; this kit does not install one, and adding one would be a new implementation of something the project may already have (Article 2.4 / 9.3).
+- **An ITIL Change Advisory Board as a MUST.** DORA's evidence is that external CABs slow delivery and do not reduce change-fail rate. Article 18 uses the pull request and Article 7 acceptance instead.
+- **Requiring Keep a Changelog in every repository.** Article 18.6 updates a changelog only when the project already keeps one.
+- **Enumerating every vendor deploy CLI in `pre-shell`.** App Store submit, production OTA, and pushes to the default branch are blocked. Other production deploys are still a release under Article 18.2; listing them all false-positives strings in test names and docs.

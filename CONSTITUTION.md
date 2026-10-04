@@ -108,9 +108,10 @@ Agents MUST stop and ask (or, when running unattended, choose the safest option 
 - the verification gate fails twice in a row for the same reason;
 - requirements are ambiguous in a way that changes user-visible behavior;
 - the change would touch payments, authentication, data deletion, or production infrastructure;
-- the blast radius is larger than the plan, or rollback is unclear for a change that can affect production users, stored data, or a trust boundary (Article 17).
+- the blast radius is larger than the plan, or rollback is unclear for a change that can affect production users, stored data, or a trust boundary (Article 17);
+- the task is a release to users and a human has not asked for that release in the current task (Article 18).
 
-A schedule, a chat or pull-request subscription, or any other unprompted signal is not human approval. Unattended agents MUST still obey every MUST rule. They MUST NOT treat a subscription as permission for Article 8.2, payments, authentication, data deletion, or production infrastructure.
+A schedule, a chat or pull-request subscription, or any other unprompted signal is not human approval. Unattended agents MUST still obey every MUST rule. They MUST NOT treat a subscription as permission for Article 8.2, payments, authentication, data deletion, production infrastructure, or a release to users.
 
 ## Article 14 - Precedence and amendments
 
@@ -141,3 +142,17 @@ A schedule, a chat or pull-request subscription, or any other unprompted signal 
 3. A change that can affect production users, stored data, or a trust boundary MUST name, before it is called done, how it is reversed: revert the commit, a down-migration the project already has, a feature flag the project already uses, or a documented forward fix. Agents MUST NOT add a feature-flag or canary platform to satisfy this article. If the project has none and rollback is not `git revert`, stop for a human (Article 13).
 4. When implementation uncovers a risk the plan missed (silent data rewrite, auth bypass, irreversible migration, impact outside this repository), the agent MUST stop and consider rolling back the in-progress change before adding more surface.
 5. Review judges this article (`code-review`). The regression guard does not compute blast radius. Destructive shell commands stay blocked by the agent hook (Article 6.5). Follow `assess-blast-radius`.
+
+## Article 18 - Change and release
+
+A **change** is code that lands on the default branch. A **release** is that code reaching users (store submit, production deploy, production OTA update, production migration, publishing a package).
+
+1. A change reaches the default branch only through the project's existing review path: a pull request that Article 7 accepted. Agents MUST NOT push commits to the default branch. Agents MUST NOT merge a pull request they authored unless a human or a different model has already accepted that pull request. They MUST NOT skip required checks.
+2. Agents MUST NOT perform a release unless a human asked for that release in the current task. A schedule, a subscription, or a green verification gate is not that ask (Article 13).
+3. A release MUST be of a git commit whose verification gate is green on that commit (Article 6). Agents MUST NOT ship from an uncommitted tree, a dirty working copy, or an artifact built from a different commit than the one being released.
+4. Agents MUST use the project's existing release path (workflow, profile, tag script, store channel). They MUST NOT add a second release mechanism. The channel MUST match the change: a native or binary change MUST NOT ship as a hot update the installed client cannot load. Follow the stack skill (`eas-build-and-release` or the repository's equivalent).
+5. When the project promotes through environments, promote the same git commit (and, when it builds artifacts, that artifact). Agents MUST NOT rebuild for production from a later or different commit than the one that passed in preview or staging.
+6. When the project records shipped versions (`CHANGELOG.md`, `VERSION`, app version, build number, `docs/PROJECT_STATE.md`), a release MUST update those records in the same change that ships, using the project's existing versioning. Agents MUST NOT invent a second version scheme. A user-visible behavior change, when the project keeps a changelog, MUST include a changelog entry in the same pull request as the behavior.
+7. A release is its own change (Article 2). Agents MUST NOT mix unrelated feature work into a release pull request.
+8. After a release, record version, build, channel or environment, and git SHA in `docs/PROJECT_STATE.md`. The completion report MUST say what was verified on the target environment and what was not (Article 11).
+9. Review judges this article (`code-review`). The `pre-shell` hook blocks App Store submit, production OTA, and pushes to the default branch. The regression guard does not detect a release. Follow `change-and-release`.
