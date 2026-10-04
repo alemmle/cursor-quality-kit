@@ -5,7 +5,7 @@ description: Run the verification gate and produce an honest completion report. 
 
 # Verify before saying "done"
 
-1. Run `./scripts/verify.sh` from the repository root. It runs the regression guard, formatting, lint, type checks, and tests. Judge the state you report: if other agents or sessions are editing the same checkout, their half-finished files can break or fake your run, so commit first and run the gate on a clean checkout of that commit.
+1. Run `./scripts/verify.sh` from the repository root. It runs the regression guard, formatting, lint, type checks, and tests. Judge the state you report: if other agents or sessions are editing the same checkout, their half-finished files can break or fake your run, so commit first and run the gate on a clean checkout of that commit. If the default branch's required checks are red and this task is not to fix them, stop (Article 6.6).
 2. If it fails, read the first failure, fix the cause in the code (never by skipping, deleting, or weakening tests, and never by adding suppressions), and run it again.
 3. If the same failure happens twice in a row, stop. Report the failure output, what you tried, and your best hypothesis. Do not keep trying random changes.
 4. Review your own diff (`git diff` and `git status`):
@@ -26,6 +26,7 @@ Verified:
 - grammar: <languages in scope, and the combinations read (a count at 0, 1, and 2), or "no user-facing text changed">
 - docs: <tokens searched, files updated, hits left as true, or "no command/path/API renamed or removed">
 - blast radius / rollback: <one paragraph, or "one-file fix; git revert">
+- detect: <existing log/metric/crash reporter/test/store listing, or "none; project has no signal">
 - release: <not a release | SHA, channel/environment, version records updated>
 - <any manual check, with device/simulator and OS>
 Not verified: <be explicit, e.g. "physical device", "EAS production build", "migration on a Neon branch", "a language in scope you did not read", "markdown not searched for retired tokens">

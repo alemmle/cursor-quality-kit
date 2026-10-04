@@ -88,6 +88,9 @@ expect "none: sync-docs-from-diff listed in AGENTS.md" grep -qF -- '- `sync-docs
 expect "none: assess-blast-radius listed in AGENTS.md" grep -qF -- '- `assess-blast-radius` -' "$repo/AGENTS.md"
 expect "none: agents summary names the docs-sync check" grep -q 'searched and updated in the same change' "$repo/AGENTS.md"
 expect "none: agents summary names blast radius" grep -q 'plan names blast radius' "$repo/AGENTS.md"
+expect "none: constitution treats flaky tests as defects" grep -q 'nondeterministic test is a defect' "$repo/.ai/CONSTITUTION.md"
+expect "none: constitution checks a red default branch" grep -q "default branch's required checks" "$repo/.ai/CONSTITUTION.md"
+expect "none: constitution names production failure detection" grep -q 'how a failure would be detected' "$repo/.ai/CONSTITUTION.md"
 expect "none: change-release rule installed" test -f "$repo/.cursor/rules/qk-09-change-release.mdc"
 expect "none: change-release rule always applies" grep -qx 'alwaysApply: true' "$repo/.cursor/rules/qk-09-change-release.mdc"
 expect "none: change-and-release skill installed" test -f "$repo/.claude/skills/change-and-release/SKILL.md"
@@ -377,6 +380,8 @@ echo "versioning"
 v="$(tr -d '[:space:]' <"$KIT/VERSION")"
 expect "VERSION matches CONSTITUTION.md" grep -qx "Version: $v" "$KIT/CONSTITUTION.md"
 expect "VERSION has a CHANGELOG entry" grep -qx "## $v" "$KIT/CHANGELOG.md"
+expect "kit records DORA fit-gap" test -f "$KIT/docs/DORA-FIT-GAP.md"
+expect "security rule runs existing scanner" grep -q 'Do not add a second scanner' "$KIT/core/cursor-rules/qk-02-security.mdc"
 
 printf '\n%d passed, %d failed\n' "$passed" "$failed"
 [ "$failed" -eq 0 ]
