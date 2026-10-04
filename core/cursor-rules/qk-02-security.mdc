@@ -15,3 +15,4 @@ alwaysApply: true
 - Do not weaken security settings (CORS `*`, disabled TLS verification, `NSAllowsArbitraryLoads`, broad permissions) to make something work. If it seems required, stop and ask.
 - New dependencies: prefer well-maintained packages; mention any package with install scripts or native code in your report.
 - Authentication, payments, data deletion, and permission changes always need human review (Constitution Article 13).
+- If the project already runs a security scanner (`npm audit`, `osv-scanner`, a workflow job), run it with the gate or the release. Do not add a second scanner to satisfy this rule.

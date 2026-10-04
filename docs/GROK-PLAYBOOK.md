@@ -18,7 +18,7 @@ The vendor guidance and research behind this are summarized in [RESEARCH.md](RES
 | Commits with `--no-verify`, sets `GUARD_ALLOW_*` itself, force-pushes, pushes to `main`, runs `eas submit`, deletes a Neon branch | `pre-shell` agent hook blocks the command before it runs |
 | Makes a test pass by branching on the test input or hardcoding the expected value | Art. 5.6, testing rule; review by a different model; mutation testing (below) |
 | A test contradicts the task and the agent "fixes" whichever side is easier | Art. 5.7: stop and quote both |
-| Makes tests green by skipping, deleting, or weakening them | `guard.sh` blocks `.only`/`.skip`/`xit`/`skip:`, deleted test files, and edits to the gate scripts |
+| Makes tests green by skipping, deleting, quarantining as flaky, or weakening them | `guard.sh` blocks `.only`/`.skip`/`xit`/`skip:`, deleted test files, and edits to the gate scripts. Art. 5.3: a nondeterministic test is a defect |
 | Silences the compiler (`any`, `@ts-ignore`, `eslint-disable`, `// ignore:`) | `guard.sh` blocks them unless the line carries `ai-guard: allow <reason>` |
 | Trusts a worker or coordinator report without reading the diff | Art. 3.4, `orchestrate-workers`; the `stop` hook and CI still apply to each worker |
 | Large diffs with drive-by refactors that break unrelated screens | Art. 2/3, `plan-small-change` skill (max 5 files and one subsystem per step, gate green after each step). The pull request as a whole is rejected above 80 files or 2500 lines unless a human applies `ai-large-diff-approved` |

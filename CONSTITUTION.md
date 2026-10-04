@@ -38,7 +38,7 @@ This constitution binds every AI coding agent (Cursor, Claude Code, Codex, Copil
 
 1. Every bug fix MUST start with a test that reproduces the bug and fails, then the fix that makes it pass.
 2. Every new feature or behavior change MUST include tests covering the main path and at least one failure or edge path.
-3. Agents MUST NOT delete, skip, focus (`.only`), weaken assertions in, or rewrite tests to make a failing change pass. A failing test means the code is wrong until proven otherwise; if the test itself is wrong, explain why in the PR.
+3. Agents MUST NOT delete, skip, focus (`.only`), weaken assertions in, quarantine, retry-until-green, or rewrite tests to make a failing change pass. A failing test means the code is wrong until proven otherwise. A nondeterministic test is a defect, not a reason to skip it. If the test itself is wrong, explain why in the PR.
 4. Agents MUST NOT regenerate snapshots or golden files to turn a red build green without describing the visual/behavioral change they accept.
 5. Agents MUST NOT silence the type checker or linter (`any`, `@ts-ignore`, `@ts-expect-error`, `eslint-disable`, `// ignore:`, `!` non-null assertions to dodge errors) unless the line carries a written justification.
 6. Agents MUST NOT make code pass tests without implementing the behavior: no special-casing test inputs, hardcoded expected outputs, overridden equality or comparison, state that changes answers between calls, or detection of the test environment.
@@ -52,6 +52,7 @@ This constitution binds every AI coding agent (Cursor, Claude Code, Codex, Copil
 3. Agents MUST NOT bypass hooks or CI (`--no-verify`, disabling workflows, editing the gate scripts to skip checks) unless a human explicitly asks for it in the current task.
 4. CI runs the same gate plus the regression guard (`.ai/bin/guard.sh`) and the mechanical diff review. CI is the final authority; a local green run does not override a red CI.
 5. In tools with agent hooks (Cursor, Claude Code, Codex), `.ai/bin/agent-hook.sh` runs the gate when the agent tries to finish and blocks commands that bypass it. Agents MUST NOT disable, edit, or work around the hook configuration (`.cursor/hooks.json`, `.claude/settings.json`, `.codex/hooks.json`).
+6. Agents SHOULD check that the default branch's required checks are green before starting work that is not fixing those checks. If they are red, the agent MUST report that. It SHOULD NOT start unrelated feature work until a human says to proceed. A local green run on a feature branch does not override a red default branch.
 
 ## Article 7 - Acceptance
 
@@ -106,6 +107,7 @@ Agents MUST stop and ask (or, when running unattended, choose the safest option 
 
 - the task requires breaking any MUST rule in this constitution;
 - the verification gate fails twice in a row for the same reason;
+- the default branch's required checks are red and the task is not to fix them;
 - requirements are ambiguous in a way that changes user-visible behavior;
 - the change would touch payments, authentication, data deletion, or production infrastructure;
 - the blast radius is larger than the plan, or rollback is unclear for a change that can affect production users, stored data, or a trust boundary (Article 17);
@@ -141,7 +143,8 @@ A schedule, a chat or pull-request subscription, or any other unprompted signal 
 2. If the real blast radius is larger than the plan (another subsystem, unexpected callers, a shared type, a migration that `git revert` cannot undo), the agent MUST stop, update the plan, and say so. It MUST NOT continue under the old plan.
 3. A change that can affect production users, stored data, or a trust boundary MUST name, before it is called done, how it is reversed: revert the commit, a down-migration the project already has, a feature flag the project already uses, or a documented forward fix. Agents MUST NOT add a feature-flag or canary platform to satisfy this article. If the project has none and rollback is not `git revert`, stop for a human (Article 13).
 4. When implementation uncovers a risk the plan missed (silent data rewrite, auth bypass, irreversible migration, impact outside this repository), the agent MUST stop and consider rolling back the in-progress change before adding more surface.
-5. Review judges this article (`code-review`). The regression guard does not compute blast radius. Destructive shell commands stay blocked by the agent hook (Article 6.5). Follow `assess-blast-radius`.
+5. A change that can affect production users MUST name how a failure would be detected with what the project already has (an existing log, metric, crash reporter, test, or store listing). If the project has none, say so under "Not verified". Agents MUST NOT add a monitoring product to satisfy this article.
+6. Review judges this article (`code-review`). The regression guard does not compute blast radius. Destructive shell commands stay blocked by the agent hook (Article 6.5). Follow `assess-blast-radius`.
 
 ## Article 18 - Change and release
 

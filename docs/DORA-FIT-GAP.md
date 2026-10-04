@@ -42,8 +42,8 @@ These seven are the capabilities DORA found amplify AI's benefit. They are the c
 | Capability | Coverage | Where | Gap |
 | --- | --- | --- | --- |
 | Streamlining change approval | **Covered** | Art. 7 peer/different-model review, Art. 18.1 no push to default branch, CI + guard. Explicitly **not** a CAB | Matches DORA: peer review plus automation. Human ask for an *agent* production release is segregation of duties for unattended tools, not a CAB |
-| Continuous integration | **Covered** for "every push runs the gate" | Art. 6, `ai-quality.yml`, stop hook | DORA also wants: merge to trunk at least daily; broken build is the only work; feedback under ~10 minutes; performance tests daily. The kit does not require daily trunk merge, does not stop all other work on a red main, and does not cap gate time |
-| Test automation | **Covered** for unit/component and "no skip/weaken" | Art. 5, testing rule, guard, `fix-bug-with-regression-test` | TDD is MUST only for **bug fixes** (Art. 5.1), SHOULD-shaped for features. No flaky-test policy. Exploratory/usability testing is human. Mutation testing is playbook-only |
+| Continuous integration | **Covered** for "every push runs the gate" and "red default branch stops unrelated work" | Art. 6, Art. 6.6 / 13, `ai-quality.yml`, stop hook | DORA also wants merge to trunk at least daily and feedback under ~10 minutes. The kit does not require daily trunk merge and does not cap gate time |
+| Test automation | **Covered** for unit/component and "no skip/weaken/quarantine" | Art. 5, testing rule, guard, `fix-bug-with-regression-test`. Art. 5.3: a nondeterministic test is a defect | TDD is MUST only for **bug fixes** (Art. 5.1). Exploratory/usability testing is human. Mutation testing is playbook-only |
 | Continuous delivery | **Partial** | Art. 18 green-commit release on the existing path; `qk-04-ci-workflows` (tags/dispatch from a green run) | "On demand at any time" is not a MUST. Mobile binaries and a human ask for agent-driven prod ship are intentional brakes. No canary/flag platform installed |
 | Deployment automation | **Partial** | Use the project's existing path (Art. 18.4); Expo skill documents EAS | Kit does not install a generic deploy pipeline. Manual store submit stays blocked for agents until a human asks |
 | Version control | **Covered** | Git is assumed; gate files and migrations are in the repo | See AI model row on prompts/system config |
@@ -86,16 +86,14 @@ These are real DORA capabilities. They should **not** become constitution MUSTs 
 1. **Human ask to release (Art. 18.2) vs deploy on demand.** DORA elite is frequent, low-ceremony production deploys. This kit's agents must not ship to users unless a human asked in the current task. That is for unattended/subscribed agents (Art. 13), not a CAB. A human can still ship on demand using the existing path.
 2. **Pull requests vs trunk-based daily merge.** DORA CI includes merging to trunk at least daily. The kit requires a reviewed PR (Art. 7/18). Short PRs are compatible; long-lived agent branches are a remaining risk the kit only caps by size.
 3. **No feature-flag platform.** DORA/SRE use flags to separate deploy from release. Article 17/18 use the project's existing flag if it has one, and forbid adding a second platform.
-4. **Broken main is not "stop the line" for every agent.** Art. 13 stops after two identical local gate failures. Nothing in the constitution says "red `main` CI means drop the current task and fix main."
+4. **Red default branch is a stop for unrelated work.** Art. 6.6 / 13: SHOULD check required checks; MUST report if red; SHOULD NOT start unrelated feature work. Not a full "stop the line" for every human, and not measured as time-to-green.
 5. **The four metrics are unmeasured.** Without them, the kit cannot claim DORA performance; it can only claim agent behavior.
 
-## Candidates if we tighten later (not in 1.10.0)
+## Taken into 1.10.0 from this fit-gap
 
-Only these look like they could become kit rules without pretending to be an org:
+- Flaky/unreliable tests are defects (Art. 5.3, testing rule). DORA: do not tolerate unreliable tests.
+- Red default-branch required checks: report and do not start unrelated work (Art. 6.6, Art. 13). DORA CI: fix the broken build first.
+- Name how a production failure would be detected with what the project already has (Art. 17.5). Not a monitoring platform.
+- If the project already has a security scanner, run it; do not add a second one (`qk-02-security`). DORA pervasive security without a new SAST product.
 
-- A SHOULD that a red default-branch gate is fixed before new feature work (DORA CI "fix the broken build first").
-- Version-control of agent prompts and hook configs that are not already gate files (DORA AI version-control survey). Hook configs already are.
-- A flaky-test / "failure means a real defect" sentence in the testing rule (DORA test automation pitfall).
-- Optional stack docs for preview→prod promotion already required by Art. 18.5, named per stack (EAS channel, backend environment).
-
-Leave out of the constitution: production monitoring, CABs, mandatory TDD for every feature, on-demand deploys, user-research loops, and DORA metric collection.
+Still out: version-control of free-form agent prompts (shared context stays scratch until harvested), per-stack promotion runbooks beyond Art. 18.5, production monitoring products, CABs, mandatory TDD for every feature, on-demand deploys, user-research loops, and DORA metric collection.

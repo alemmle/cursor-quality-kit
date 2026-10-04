@@ -11,6 +11,7 @@ Before a change that is not a one-file fix, name the blast radius in the plan (`
 - Callers of any public interface you will change. Search first; update them in the same change (scope rule).
 - Data that can change, and whether production, auth, payments, or native config is on the path.
 - How the change is reversed: `git revert`, a down-migration the project already has, a feature flag the project already uses, or a documented forward fix.
+- How a production failure would be seen: an existing log, metric, crash reporter, test, or store listing — or "none; will say so under Not verified". Do not add a monitoring product.
 
 If implementation shows a larger radius than the plan (another subsystem, unexpected callers, a shared type, a migration `git revert` cannot undo), stop, update the plan, and say so. Do not keep implementing under the old plan. Consider rolling back the in-progress change before adding more surface.
 

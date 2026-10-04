@@ -18,6 +18,7 @@ Blast radius:
 - Data: <none | which tables/rows/files>
 - Production / auth / payments / native: <yes/no, which>
 Rollback: <git revert | existing down-migration | existing feature flag | forward fix - describe>
+Detect: <existing log/metric/crash reporter/test/store listing | none>
 Stop if: <what would mean the radius is larger than this plan>
 ```
 
@@ -26,7 +27,7 @@ Rules:
 - One step still means at most 5 files and one subsystem (Article 2.3). A wide radius is a reason to split, not to enlarge the step.
 - `git revert` is enough when the change is code-only and does not rewrite stored data.
 - A migration, data backfill, or anything `git revert` cannot undo needs the reverse path the project already uses. If there is none, stop for a human (Article 13).
-- Do not add a flag system, canary pipeline, or second config mechanism to satisfy this article.
+- Do not add a flag system, canary pipeline, monitoring product, or second config mechanism to satisfy this article.
 
 ## 2. During implementation
 
@@ -65,5 +66,6 @@ This skill names radius and rollback **before** those hooks fire, and stops when
 ```markdown
 Blast radius: <one paragraph from the plan, plus any widening you found>
 Rollback: <the path you named, and whether you used it>
+Detect: <existing signal, or "none">
 Stopped: <no, or what you stopped for>
 ```

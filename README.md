@@ -177,6 +177,7 @@ scripts/harvest-pr.sh      open one kit pull request per proposal (used by harve
 scripts/rollout.sh         install the kit into every repository in rollout/ (used by rollout.yml)
 rollout/                   per repository: stack and options, superseded paths, PR notes
 docs/HOW-TO-NEW-APP.md     steps for installing the kit into a new repository
+docs/DORA-FIT-GAP.md       DORA catalog vs this kit
 tests/run.sh               self-tests for the installer and guard
 ```
 
