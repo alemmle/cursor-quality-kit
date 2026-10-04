@@ -1,0 +1,19 @@
+---
+description: Name blast radius and rollback before editing; stop when the real radius is larger than the plan
+alwaysApply: true
+---
+
+# Blast radius and reversibility
+
+Before a change that is not a one-file fix, name the blast radius in the plan (`assess-blast-radius`, Article 17):
+
+- Files and subsystems that can break (UI, navigation, state, API, database, native config).
+- Callers of any public interface you will change. Search first; update them in the same change (scope rule).
+- Data that can change, and whether production, auth, payments, or native config is on the path.
+- How the change is reversed: `git revert`, a down-migration the project already has, a feature flag the project already uses, or a documented forward fix.
+
+If implementation shows a larger radius than the plan (another subsystem, unexpected callers, a shared type, a migration `git revert` cannot undo), stop, update the plan, and say so. Do not keep implementing under the old plan. Consider rolling back the in-progress change before adding more surface.
+
+Do not add a feature-flag or canary platform to satisfy this rule. Use the rollback the project already has. If it has none and rollback is not `git revert` for a change that can affect production users, stored data, or a trust boundary, stop for a human (Article 13).
+
+Destructive shell commands stay blocked by `.ai/bin/agent-hook.sh`. Review judges this rule (`code-review`). The regression guard does not compute blast radius.

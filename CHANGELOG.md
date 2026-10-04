@@ -2,6 +2,13 @@
 
 Versioning policy: [docs/VERSIONING.md](docs/VERSIONING.md).
 
+## 1.10.0
+
+Documentation matches the code, and blast radius is named before a change proceeds.
+
+- Constitution Article 16: markdown that states a fact about the repository stays true of the committed code. When a change removes, renames, or changes the meaning of a command, flag, path, identifier, env var, config key, or API, the agent searches `*.md` / `*.mdc` for that token, reads each hit, and updates the file in the same change if the sentence is no longer true. New always-on rule `qk-07-docs-sync` and skill `sync-docs-from-diff`. Judged in `code-review`. The regression guard does not parse markdown for stale tokens. Rejected: a Python/Node doc-drift gate in `core/` (not portable) and failing CI on every leftover token (changelog entries and quotes stay valid).
+- Constitution Article 17: the plan names blast radius and how the change is reversed. If the real radius is larger than the plan, or rollback is unclear for production users, stored data, or a trust boundary, the agent stops. New always-on rule `qk-08-blast-radius` and skill `assess-blast-radius`. Article 3.1 and Article 13 match. Destructive shell commands stay blocked by the existing agent hook. Rejected: requiring a feature-flag or canary platform (stack-specific infra the kit does not install) and an LLM stop-hook that guesses blast radius (not deterministic).
+
 ## 1.9.0
 
 Higher pull-request size ceiling.

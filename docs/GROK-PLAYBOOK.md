@@ -29,6 +29,8 @@ The vendor guidance and research behind this are summarized in [RESEARCH.md](RES
 | Puts the Neon connection string or secrets in the app | Expo/Neon rules, `guard.sh` secret and `EXPO_PUBLIC_*` checks |
 | Leaves a catalog, threshold, label, or other enrichable value as an unmarked literal | Art. 9; `code-review` asks. The guard does not flag literals: protocol fields, status codes, and type discriminants stay in source |
 | Ships "1 items", "0 item", or another broken combination of a dynamic value and words | Art. 15, grammar rule; `code-review` asks. The guard does not parse grammar |
+| Leaves `AGENTS.md` or a skill naming a command, path, or API the change deleted | Art. 16, `qk-07-docs-sync`, `sync-docs-from-diff`. The guard does not parse markdown for stale tokens |
+| Keeps implementing after extra callers or an irreversible migration show up | Art. 17, `qk-08-blast-radius`, `assess-blast-radius`, Art. 13 stop. Destructive shells stay blocked by the `pre-shell` hook. The guard does not compute blast radius |
 | Edits an applied migration or drops columns that shipped apps still use | `neon-schema-change` skill (expand, then contract), guard blocks edits to existing migration files, per-PR Neon branch |
 | Ships an OTA update that needs native code | `eas-build-and-release` skill (runtime version / fingerprint policy) |
 | Screen works in Jest but is broken on iOS | Maestro flows on an EAS simulator build (`.eas/workflows/e2e-test-ios.yml`) |

@@ -29,6 +29,8 @@ It prints `ACCEPT` or `REJECT` and exits 0 or 1. CI runs the same stages. Stage 
 - Behavior change without tests, or a bug fix without a regression test.
 - The completion report claims verification that did not happen.
 - User-facing text in a language in scope that was not grammar-checked, or a count joined to a fixed word so singular and plural cannot both be correct.
+- Markdown that still describes a command, path, flag, or API the change removed or renamed, except a changelog, quote, or example of what was removed.
+- A change that can affect production users, stored data, or a trust boundary with no named reverse path the project already has, or a blast radius larger than the plan that the author continued anyway.
 
 ## Human overrides
 

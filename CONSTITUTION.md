@@ -1,6 +1,6 @@
 # AI Code Constitution
 
-Version: 1.9.0
+Version: 1.10.0
 
 This constitution binds every AI coding agent (Cursor, Claude Code, Codex, Copilot, Gemini, Windsurf, Cline, Aider, ...) and every model (Grok, Claude, GPT, Gemini, ...) working in a repository that includes it. It is model-agnostic on purpose: the rules describe observable behavior, and the important ones are enforced by scripts and CI, not by trust.
 
@@ -23,7 +23,7 @@ This constitution binds every AI coding agent (Cursor, Claude Code, Codex, Copil
 
 ## Article 3 - Plan before code
 
-1. For any task that is not a one-file fix, the agent MUST write a plan before editing. The plan lists: files to change, what changes in each, risks, and how the change will be tested.
+1. For any task that is not a one-file fix, the agent MUST write a plan before editing. The plan lists: files to change, what changes in each, blast radius (Article 17), how the change is reversed, and how it will be tested.
 2. The plan is executed one step at a time. After each step the verification gate (Article 6) MUST pass before the next step starts.
 3. If reality diverges from the plan (an API is different, a file does not exist), the agent MUST stop, update the plan, and say so. It MUST NOT improvise silently.
 4. Dispatching work to other agents, including a coordinator that only plans and delegates, does not waive this article or Article 2. Each lane MUST have a disjoint file scope, MUST pass the verification gate on its own tree, and MUST be merged only after the merged tree passes the gate. Follow `orchestrate-workers`.
@@ -97,7 +97,7 @@ This constitution binds every AI coding agent (Cursor, Claude Code, Codex, Copil
 ## Article 12 - Commits and documentation
 
 1. One logical change per commit, with a message that explains why.
-2. When behavior, setup, or architecture changes, the agent MUST update `AGENTS.md` and/or `docs/PROJECT_STATE.md` in the same PR.
+2. When behavior, setup, or architecture changes, the agent MUST update `AGENTS.md` and/or `docs/PROJECT_STATE.md` in the same PR. Markdown that names a token the change removed or renamed follows Article 16.
 3. Architectural changes MUST include a short tradeoff explanation (what was chosen, what was rejected, why).
 
 ## Article 13 - When to stop
@@ -107,7 +107,8 @@ Agents MUST stop and ask (or, when running unattended, choose the safest option 
 - the task requires breaking any MUST rule in this constitution;
 - the verification gate fails twice in a row for the same reason;
 - requirements are ambiguous in a way that changes user-visible behavior;
-- the change would touch payments, authentication, data deletion, or production infrastructure.
+- the change would touch payments, authentication, data deletion, or production infrastructure;
+- the blast radius is larger than the plan, or rollback is unclear for a change that can affect production users, stored data, or a trust boundary (Article 17).
 
 A schedule, a chat or pull-request subscription, or any other unprompted signal is not human approval. Unattended agents MUST still obey every MUST rule. They MUST NOT treat a subscription as permission for Article 8.2, payments, authentication, data deletion, or production infrastructure.
 
@@ -125,3 +126,18 @@ A schedule, a chat or pull-request subscription, or any other unprompted signal 
 4. Agents MUST NOT build those phrases by concatenating a value and a fixed word. Use the pluralization the project already has. If it has none, add the forms for each language in scope in the same change. Do not add a second localization library.
 5. Tests for such a string MUST assert the rendered phrase for those counts. A test that only checks that a key exists does not satisfy this article.
 6. The completion report MUST say which languages and combinations were checked. Review judges this article (`code-review`). The regression guard does not parse grammar.
+
+## Article 16 - Documentation matches the code
+
+1. Markdown that states a fact about this repository (a command, flag, path, identifier, environment variable, config key, API, or architecture claim) MUST stay true of the committed code. Stale agent docs are acted on as if they were true.
+2. When a change removes, renames, or changes the meaning of such a token, the agent MUST search the repository's markdown and Cursor rules (`*.md`, `*.mdc`, and the managed instruction files) for that token. Each hit MUST be read. If the sentence is no longer true, the file MUST be updated in the same change. If it is still true (a changelog entry, a quote of the old name, an example of what was removed), say so in the completion report.
+3. Agents MUST NOT leave `AGENTS.md`, `docs/PROJECT_STATE.md`, skills, or rules describing a command, path, or API that the change deleted or renamed.
+4. Review judges this article (`code-review`). The regression guard does not parse markdown for stale tokens. Follow `sync-docs-from-diff`.
+
+## Article 17 - Blast radius and reversibility
+
+1. For any task that is not a one-file fix (Article 3), before editing, the agent MUST name the blast radius: which files and subsystems can break, which callers of a public interface are affected, which data can change, and whether production, auth, payments, or native config is on the path. Write it in the plan.
+2. If the real blast radius is larger than the plan (another subsystem, unexpected callers, a shared type, a migration that `git revert` cannot undo), the agent MUST stop, update the plan, and say so. It MUST NOT continue under the old plan.
+3. A change that can affect production users, stored data, or a trust boundary MUST name, before it is called done, how it is reversed: revert the commit, a down-migration the project already has, a feature flag the project already uses, or a documented forward fix. Agents MUST NOT add a feature-flag or canary platform to satisfy this article. If the project has none and rollback is not `git revert`, stop for a human (Article 13).
+4. When implementation uncovers a risk the plan missed (silent data rewrite, auth bypass, irreversible migration, impact outside this repository), the agent MUST stop and consider rolling back the in-progress change before adding more surface.
+5. Review judges this article (`code-review`). The regression guard does not compute blast radius. Destructive shell commands stay blocked by the agent hook (Article 6.5). Follow `assess-blast-radius`.

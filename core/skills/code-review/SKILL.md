@@ -33,6 +33,8 @@ Read the task/issue and the plan. For each changed file answer:
 9. **Report honest?** The author's "verified" claims match CI output.
 10. **Parametric values?** A new literal that product will enrich, or that differs by deploy, is a blocker unless the file or pull request marks it as a prototype or mock, it is a true program constant (protocol field, status code, type discriminant), or the pull request states why it stays in source (Article 9). Do not flag those constants. Secrets stay under the security check.
 11. **Grammar?** User-facing text in a language in scope was read as the user sees or hears it (Article 15). A dynamic value combined with words, especially a count, was checked for agreement at 0, 1, and 2 and for every other number category that language uses. Concatenating a number and a fixed noun, or a test that only asserts a key exists, is a blocker.
+12. **Docs still true?** Tokens the change removed or renamed (commands, flags, paths, identifiers, env vars, config keys, APIs) were searched in markdown and rules (Article 16). A sentence that is no longer true and was left in `AGENTS.md`, `docs/PROJECT_STATE.md`, a skill, or a rule is a blocker. A changelog, quote, or example of the old name is not.
+13. **Blast radius?** The plan named radius and rollback (Article 17). Continuing after a larger radius than the plan, or shipping a production/data/trust-boundary change with no reverse path the project already has, is a blocker. Do not require a new feature-flag platform.
 
 ## 3. Verdict
 
