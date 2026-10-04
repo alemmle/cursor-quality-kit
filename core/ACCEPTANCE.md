@@ -28,6 +28,7 @@ It prints `ACCEPT` or `REJECT` and exits 0 or 1. CI runs the same stages. Stage 
 - Edits to applied migrations, or destructive schema changes without human approval.
 - Behavior change without tests, or a bug fix without a regression test.
 - The completion report claims verification that did not happen.
+- User-facing text in a language in scope that was not grammar-checked, or a count joined to a fixed word so singular and plural cannot both be correct.
 
 ## Human overrides
 

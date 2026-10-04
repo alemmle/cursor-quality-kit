@@ -28,6 +28,7 @@ The vendor guidance and research behind this are summarized in [RESEARCH.md](RES
 | Fixes symptoms; the same bug comes back | `fix-bug-with-regression-test` skill: failing test first, root cause written down |
 | Puts the Neon connection string or secrets in the app | Expo/Neon rules, `guard.sh` secret and `EXPO_PUBLIC_*` checks |
 | Leaves a catalog, threshold, label, or other enrichable value as an unmarked literal | Art. 9; `code-review` asks. The guard does not flag literals: protocol fields, status codes, and type discriminants stay in source |
+| Ships "1 items", "0 item", or another broken combination of a dynamic value and words | Art. 15, grammar rule; `code-review` asks. The guard does not parse grammar |
 | Edits an applied migration or drops columns that shipped apps still use | `neon-schema-change` skill (expand, then contract), guard blocks edits to existing migration files, per-PR Neon branch |
 | Ships an OTA update that needs native code | `eas-build-and-release` skill (runtime version / fingerprint policy) |
 | Screen works in Jest but is broken on iOS | Maestro flows on an EAS simulator build (`.eas/workflows/e2e-test-ios.yml`) |

@@ -1,0 +1,21 @@
+---
+description: Grammar-check user-facing text in every language in scope, including singular and plural when a value is combined with words
+alwaysApply: true
+---
+
+# Grammar of user-facing text
+
+Languages in scope are the languages the repository names for users (`AGENTS.md`, `docs/PROJECT_STATE.md`, or the localization catalog). When none are named, every language that already has user-facing strings in the repository is in scope. Do not add a language the repository does not ship.
+
+User-facing text is anything a person reads or hears: labels, buttons, errors, empty states, notifications, emails, and accessibility names that are spoken.
+
+When you add or edit that text in a language in scope:
+
+- Read it as the user sees or hears it, in that language, before you call the change done. A template with placeholders is not the check.
+- A string that joins a dynamic value (a count, a name, a unit, a date) with surrounding words is checked as the combinations the user can get. Render each combination and read that sentence.
+- A count must agree in number. Check at least 0, 1, and 2, and every other number category that language uses (for example dual, few, many). In English, read "1 item", "0 items", and "2 items"; "1 items" and "0 item" fail. Other languages in scope follow their own agreement, including gender, case, and word order that change with the inserted value.
+- Do not build the phrase by concatenating a value and a fixed word, such as a count plus " items" or a template that only offers "item(s)". Use the pluralization the project already has. If it has none, add the forms for each language in scope in the same change. Do not add a second localization library.
+- Tests for such a string assert the rendered phrase for those counts. A test that only checks that a key or template exists does not count (see the testing rule).
+- In the completion report, name the languages and the combinations you read. If you did not check a language in scope, say so under "Not verified".
+
+Review judges this rule (`code-review`). The regression guard does not parse grammar.

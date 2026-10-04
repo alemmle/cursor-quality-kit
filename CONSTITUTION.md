@@ -1,6 +1,6 @@
 # AI Code Constitution
 
-Version: 1.7.0
+Version: 1.8.0
 
 This constitution binds every AI coding agent (Cursor, Claude Code, Codex, Copilot, Gemini, Windsurf, Cline, Aider, ...) and every model (Grok, Claude, GPT, Gemini, ...) working in a repository that includes it. It is model-agnostic on purpose: the rules describe observable behavior, and the important ones are enforced by scripts and CI, not by trust.
 
@@ -104,7 +104,7 @@ This constitution binds every AI coding agent (Cursor, Claude Code, Codex, Copil
 
 Agents MUST stop and ask (or, when running unattended, choose the safest option and document it) when:
 
-- the task requires breaking any MUST rule above;
+- the task requires breaking any MUST rule in this constitution;
 - the verification gate fails twice in a row for the same reason;
 - requirements are ambiguous in a way that changes user-visible behavior;
 - the change would touch payments, authentication, data deletion, or production infrastructure.
@@ -116,3 +116,12 @@ A schedule, a chat or pull-request subscription, or any other unprompted signal 
 1. Order of precedence: explicit human instruction in the current task > repository `AGENTS.md` > this constitution > tool defaults. A tool's coordinator, shared context, automations, and UI defaults are tool defaults.
 2. A repository MAY tighten these rules. It MUST NOT loosen a MUST rule except through a pull request that changes the repository's `AGENTS.md` and is approved by a human.
 3. This constitution is versioned. Repositories record the installed version in `.ai/KIT_VERSION`; CI flags drift from the central copy.
+
+## Article 15 - User-facing language
+
+1. Languages in scope are the languages the repository names for users (in `AGENTS.md`, `docs/PROJECT_STATE.md`, or the localization catalog). When none are named, every language that already has user-facing strings in the repository is in scope.
+2. A change that adds or edits user-facing text in a language in scope MUST include a grammar check of that text in that language before the change is called done. The check is reading the text as the user sees or hears it.
+3. A string that combines a dynamic value with surrounding text MUST be checked as the combinations the user can see, not as the template alone. A count MUST be checked for singular and plural at 0, 1, and 2, and for every other number category that language uses.
+4. Agents MUST NOT build those phrases by concatenating a value and a fixed word. Use the pluralization the project already has. If it has none, add the forms for each language in scope in the same change. Do not add a second localization library.
+5. Tests for such a string MUST assert the rendered phrase for those counts. A test that only checks that a key exists does not satisfy this article.
+6. The completion report MUST say which languages and combinations were checked. Review judges this article (`code-review`). The regression guard does not parse grammar.

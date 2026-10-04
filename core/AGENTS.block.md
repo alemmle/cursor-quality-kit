@@ -12,6 +12,7 @@ This repository follows the AI Code Constitution in `.ai/CONSTITUTION.md` and th
    Never special-case test inputs to get green. If a test contradicts the task, stop and say so.
 8. No secrets in code. Nothing privileged in the mobile binary. A value that product will enrich, or that differs by deploy, lives in the project's config, environment, or a table. A literal is only for a marked prototype or mock, or for a true program constant.
 9. Before review, `.ai/bin/accept.sh` must print ACCEPT. Report what changed, what you verified (commands + results), and what you did not verify.
+10. User-facing text in a language in scope is grammar-checked as the user sees it. A count combined with words is checked at 0, 1, and 2, and for every other number category that language uses. Do not concatenate a number and a fixed noun.
 
 ### Commands
 

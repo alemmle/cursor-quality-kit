@@ -13,6 +13,7 @@ Non-negotiable, regardless of model:
 - Non-trivial task: write the plan first (files, changes, risks, test plan). Execute one step at a time; run `./scripts/verify.sh` after each step. Parallel workers need disjoint file scopes and a green gate per lane and after each merge (`orchestrate-workers`).
 - Smallest diff that solves the task. Do not touch unrelated code. Do not create duplicate helpers, hooks, services, or components; search first.
 - A value that product will enrich, or that differs by deploy, does not live as an unmarked literal. Use the project's config, environment, or table. A literal is only for a marked prototype or mock, or for a true program constant.
+- User-facing text in a language in scope is grammar-checked as the user sees it. A count combined with words is checked at 0, 1, and 2, and for every other number category that language uses. Do not concatenate a number and a fixed noun.
 - Do not use any API, prop, config key, or CLI flag until you have confirmed it exists in the installed version (check `node_modules`, lockfile, or `pubspec.lock`).
 - Bug fix: write a failing test that reproduces it, then fix.
 - Never delete, skip, `.only`, or weaken tests. Never add `@ts-ignore`, `eslint-disable`, `any`, or `// ignore:` to get green.
