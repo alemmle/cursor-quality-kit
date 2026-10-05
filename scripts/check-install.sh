@@ -28,6 +28,7 @@ same "$KIT_DIR/core/bin/guard.sh" ".ai/bin/guard.sh" "regression guard"
 same "$KIT_DIR/core/bin/diff-review.sh" ".ai/bin/diff-review.sh" "diff review"
 same "$KIT_DIR/core/bin/accept.sh" ".ai/bin/accept.sh" "acceptance pipeline"
 same "$KIT_DIR/core/bin/agent-hook.sh" ".ai/bin/agent-hook.sh" "agent hook"
+same "$KIT_DIR/core/bin/deps.sh" ".ai/bin/deps.sh" "dependency check"
 same "$KIT_DIR/core/cursor-rules/qk-00-constitution.mdc" ".cursor/rules/qk-00-constitution.mdc" "cursor rule"
 
 for f in .cursor/hooks.json .claude/settings.json .codex/hooks.json; do

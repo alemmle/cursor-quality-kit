@@ -31,6 +31,7 @@ new_repo() {
   git -C "$d" config commit.gpgsign false
   printf '%s\n' "$d"
 }
+g_deps() { (cd "$1" && ./.ai/bin/deps.sh); }
 commit_all() { git -C "$1" add -A && git -C "$1" commit -qm "${2:-change}"; }
 
 echo "installer"
@@ -161,15 +162,35 @@ expect "check-install: direct verify.sh run counts" "$KIT/scripts/check-install.
 
 repo="$(new_repo missing-nm)"
 "$KIT/scripts/install.sh" --stack none "$repo" >/dev/null
+expect "install: deps.sh executable" test -x "$repo/.ai/bin/deps.sh"
 printf '{"name":"app"}\n' >"$repo/package.json"
-expect_fail "verify: package.json without node_modules" 'dependencies not installed, run npm ci' "$repo/scripts/verify.sh"
+expect_fail "verify: package.json without node_modules" 'dependencies not installed. Run: npm install' "$repo/scripts/verify.sh"
 mkdir "$repo/node_modules"
 expect_fail "verify: node_modules present still runs project checks" 'no project checks yet' "$repo/scripts/verify.sh"
 mkdir -p "$repo/web"
 printf '{"name":"web"}\n' >"$repo/web/package.json"
-rm -rf "$repo/node_modules"
+printf '{}\n' >"$repo/web/package-lock.json"
+expect_fail "deps: nested package names its directory and npm ci" 'web: dependencies not installed. Run: cd web && npm ci' g_deps "$repo"
+mkdir -p "$repo/web/node_modules"
+printf '{}\n' >"$repo/web/node_modules/.package-lock.json"
+touch -t 202001010000 "$repo/web/node_modules/.package-lock.json"
+expect_fail "deps: lockfile newer than the install is stale" 'web: dependencies older than package-lock.json' g_deps "$repo"
+touch "$repo/web/node_modules/.package-lock.json"
+expect "deps: fresh install passes" g_deps "$repo"
+printf 'dist/\nnode_modules/\n' >"$repo/.gitignore"
+mkdir -p "$repo/dist"
+printf '{"name":"built"}\n' >"$repo/dist/package.json"
+expect "deps: ignored build output is skipped" g_deps "$repo"
+
+repo="$(new_repo workspaces)"
+"$KIT/scripts/install.sh" --stack none "$repo" >/dev/null
+printf '{"name":"root","workspaces":["packages/*"]}\n' >"$repo/package.json"
+printf 'lockfileVersion: 9\n' >"$repo/pnpm-lock.yaml"
+mkdir -p "$repo/packages/a"
+printf '{"name":"a"}\n' >"$repo/packages/a/package.json"
+expect_fail "deps: pnpm lockfile picks pnpm" 'Run: pnpm install --frozen-lockfile' g_deps "$repo"
 mkdir "$repo/node_modules"
-expect_fail "verify: nested package.json without node_modules" 'dependencies not installed, run npm ci' "$repo/scripts/verify.sh"
+expect "deps: workspace members need no node_modules of their own" g_deps "$repo"
 
 echo "guard"
 repo="$(new_repo guard)"

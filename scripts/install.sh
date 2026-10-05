@@ -233,7 +233,7 @@ echo "cursor-quality-kit $VERSION -> $target (stack: $stack)"
 echo "Constitution, acceptance criteria and gate scripts"
 managed "$KIT_DIR/CONSTITUTION.md" ".ai/CONSTITUTION.md"
 managed "$KIT_DIR/core/ACCEPTANCE.md" ".ai/ACCEPTANCE.md"
-for b in guard.sh diff-review.sh accept.sh agent-hook.sh; do
+for b in guard.sh diff-review.sh accept.sh agent-hook.sh deps.sh; do
   managed "$KIT_DIR/core/bin/$b" ".ai/bin/$b"
   chmod +x "$target/.ai/bin/$b"
 done

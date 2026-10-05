@@ -2,6 +2,16 @@
 
 Versioning policy: [docs/VERSIONING.md](docs/VERSIONING.md).
 
+## 2.1.0
+
+The dependency check in `scripts/verify.sh` moves to the kit-managed `.ai/bin/deps.sh` and stops failing on layouts that are installed correctly.
+
+- `.ai/bin/deps.sh` replaces the `require_node_modules` function copied into the `verify.sh` templates. It is a managed file, so `install.sh` keeps it current in existing repositories and `check-install.sh` compares it with the kit. `verify.sh` files created by 2.0.0 keep their own copy of the old function until a human switches them to `./.ai/bin/deps.sh`.
+- It lists `package.json` files with `git ls-files`, so ignored paths (build output, `dist/`, vendored `node_modules`) no longer need an install.
+- Workspace members (an ancestor `package.json` with `"workspaces"`, or `pnpm-workspace.yaml`) are covered by the root install and need no `node_modules` of their own.
+- The message names the directory and the command for its lockfile: `npm ci`, `pnpm install --frozen-lockfile`, `yarn install --frozen-lockfile`, `bun install --frozen-lockfile`, or `npm install` without a lockfile.
+- It fails when the lockfile is newer than the last install (npm, pnpm, yarn), for example after a pull changed dependencies. CI installs fresh, so this only fires locally.
+
 ## 2.0.0
 
 stack=none runs the verification gate in CI, and a local skip is not "done" unless a CI job covers it.

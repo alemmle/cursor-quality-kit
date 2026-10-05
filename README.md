@@ -20,6 +20,7 @@ Why this exists and how to use it with Grok: [docs/GROK-PLAYBOOK.md](docs/GROK-P
 | `.ai/CONSTITUTION.md` | The constitution ([source](CONSTITUTION.md)) | yes |
 | `.ai/bin/guard.sh` | Regression guard: blocks skipped/deleted tests, suppressions, `any`, secrets, gate edits, migration edits | yes |
 | `.ai/ACCEPTANCE.md`, `.ai/bin/accept.sh`, `.ai/bin/diff-review.sh` | Acceptance criteria and the ACCEPT / REJECT run (gate, guard, mechanical diff review) | yes |
+| `.ai/bin/deps.sh` | Called by `scripts/verify.sh`: fails with the install command when Node dependencies are missing or older than the lockfile | yes |
 | `.ai/bin/agent-hook.sh` | Agent hook: reruns the gate when the agent tries to finish, blocks gate-bypassing and destructive commands | yes |
 | `.cursor/hooks.json`, `.claude/settings.json`, `.codex/hooks.json` | Run the agent hook in Cursor, Claude Code and Codex. If one exists without the kit entries, the installer warns and you merge them | created once |
 | `.github/instructions/qk-*.instructions.md` | Copilot path-specific instructions generated from the Cursor rules | yes |
@@ -157,7 +158,7 @@ core/                      installed in every repository
   AGENTS.block.md          managed AGENTS.md block
   adapters/                CLAUDE.md, GEMINI.md, Copilot blocks
   ACCEPTANCE.md            acceptance criteria (same for every tool and model)
-  bin/                     guard.sh, diff-review.sh, accept.sh, agent-hook.sh
+  bin/                     guard.sh, diff-review.sh, accept.sh, agent-hook.sh, deps.sh
   cursor-rules/            constitution (always on), scope, security, testing, CI workflows, grammar
   githooks/                pre-commit, pre-push
   skills/                  plan-small-change, fix-bug-with-regression-test, verify-before-done,
