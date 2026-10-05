@@ -15,3 +15,27 @@ jobs:
     with:
       kit-repo: {{KIT_REPO}}
       kit-ref: {{KIT_REF}}
+
+  detect:
+    runs-on: ubuntu-latest
+    outputs:
+      call_verify: ${{ steps.d.outputs.call_verify }}
+    steps:
+      - uses: actions/checkout@v7
+      - id: d
+        run: |
+          if find . \( -name node_modules -o -name .git -o -name .quality-kit \) -prune -o \( -name package.json -o -name pubspec.yaml \) -print | grep -q .; then
+            echo "call_verify=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "call_verify=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  # When package.json is not at the repo root, set install-directory (e.g. web/).
+  verify:
+    needs: detect
+    if: needs.detect.outputs.call_verify == 'true'
+    uses: {{KIT_REPO}}/.github/workflows/verify.yml@{{KIT_REF}}
+    with:
+      install-directory: .
+      node-version: '22'
+      setup-flutter: false

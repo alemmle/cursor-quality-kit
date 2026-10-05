@@ -9,7 +9,7 @@ This repository follows the AI Code Constitution in `.ai/CONSTITUTION.md` and th
 5. Bug fix: failing regression test first, then the fix. Feature: tests for the main path and one failure path.
 6. Never delete, skip, focus, quarantine as flaky, or weaken tests, and never add `@ts-ignore` / `eslint-disable` / `// ignore:` / `any` to get green.
 7. Done means `./scripts/verify.sh` exits 0 and you report the real output. Never use `--no-verify`. In Cursor, Claude Code and Codex, `.ai/bin/agent-hook.sh` reruns the gate when you try to finish and sends you back if it fails; never edit or disable the hook configs.
-   Never special-case test inputs to get green. If a test contradicts the task, stop and say so. If the default branch's required checks are red and the task is not to fix them, stop.
+   Never special-case test inputs to get green. If a test contradicts the task, stop and say so. If the default branch's required checks are red and the task is not to fix them, stop. If a stage could not run locally, name the CI job that runs it; if there is no such job, the task is not done.
 8. No secrets in code. Nothing privileged in the mobile binary. A value that product will enrich, or that differs by deploy, lives in the project's config, environment, or a table. A literal is only for a marked prototype or mock, or for a true program constant.
 9. Before review, `.ai/bin/accept.sh` must print ACCEPT. Report what changed, what you verified (commands + results), and what you did not verify.
 10. User-facing text in a language in scope is grammar-checked as the user sees it. A count combined with words is checked at 0, 1, and 2, and for every other number category that language uses. Do not concatenate a number and a fixed noun.

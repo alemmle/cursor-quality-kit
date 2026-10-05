@@ -24,6 +24,8 @@ The new app repository must already exist on GitHub before Roll out runs. Roll o
 
 `verify` is the command a new `scripts/verify.sh` runs after the regression guard. If the repository already has `scripts/verify.sh`, leave `verify` out so the installer keeps that file.
 
+stack=`none` CI calls `verify.yml`, which runs `npm ci` then `./scripts/verify.sh`. If `package.json` lives in a subdirectory (for example `web/`), after install set `install-directory` on the `verify` job in `.github/workflows/ai-quality.yml`.
+
 ## 2. Add the rollout file and push it to main
 
 On your Mac, replace `my-new-app` with the repository name. Change `stack` and `verify` using the table above.

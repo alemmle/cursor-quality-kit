@@ -27,7 +27,7 @@ It prints `ACCEPT` or `REJECT` and exits 0 or 1. CI runs the same stages. Stage 
 - Secrets or privileged credentials in the diff or the app binary.
 - Edits to applied migrations, or destructive schema changes without human approval.
 - Behavior change without tests, or a bug fix without a regression test.
-- The completion report claims verification that did not happen.
+- The completion report claims verification that did not happen, or a stage that could not run locally with no named CI job that runs it.
 - User-facing text in a language in scope that was not grammar-checked, or a count joined to a fixed word so singular and plural cannot both be correct.
 - Markdown that still describes a command, path, flag, or API the change removed or renamed, except a changelog, quote, or example of what was removed.
 - A change that can affect production users, stored data, or a trust boundary with no named reverse path the project already has, a blast radius larger than the plan that the author continued anyway, or a production-affecting change with no named detection signal and no statement that the project has none.

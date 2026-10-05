@@ -1,6 +1,6 @@
 # AI Code Constitution
 
-Version: 1.11.0
+Version: 2.0.0
 
 This constitution binds every AI coding agent (Cursor, Claude Code, Codex, Copilot, Gemini, Windsurf, Cline, Aider, ...) and every model (Grok, Claude, GPT, Gemini, ...) working in a repository that includes it. It is model-agnostic on purpose: the rules describe observable behavior, and the important ones are enforced by scripts and CI, not by trust.
 
@@ -53,6 +53,7 @@ This constitution binds every AI coding agent (Cursor, Claude Code, Codex, Copil
 4. CI runs the same gate plus the regression guard (`.ai/bin/guard.sh`) and the mechanical diff review. CI is the final authority; a local green run does not override a red CI.
 5. In tools with agent hooks (Cursor, Claude Code, Codex), `.ai/bin/agent-hook.sh` runs the gate when the agent tries to finish and blocks commands that bypass it. Agents MUST NOT disable, edit, or work around the hook configuration (`.cursor/hooks.json`, `.claude/settings.json`, `.codex/hooks.json`).
 6. Agents SHOULD check that the default branch's required checks are green before starting work that is not fixing those checks. If they are red, the agent MUST report that. It SHOULD NOT start unrelated feature work until a human says to proceed. A local green run on a feature branch does not override a red default branch.
+7. If a verification stage could not run in the agent's environment (missing toolchain, simulator, credentials, or dependencies), the agent MUST name the CI job that runs that stage. If no job in `.github/workflows` runs it, the task is not done.
 
 ## Article 7 - Acceptance
 

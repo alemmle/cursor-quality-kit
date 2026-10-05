@@ -7,7 +7,7 @@ alwaysApply: false
 # CI workflow rules
 
 - `.github/workflows/` files are gate files: the guard blocks edits unless a human approves them (`ai-gate-change-approved`). Explain every change to triggers, permissions, or required checks in the PR.
-- CI runs the same gate as local work: `./scripts/verify.sh`. Do not maintain a second list of checks in YAML; add a check to the gate script instead.
+- CI runs the same gate as local work: `./scripts/verify.sh`. Do not maintain a second list of checks in YAML; add a check to the gate script instead. stack=none calls `verify.yml` (set `install-directory` when `package.json` is not at the repo root). Expo and backend call `node-quality.yml`; Flutter calls `flutter-quality.yml`. `check-install.sh` fails when no workflow job runs the gate.
 - Never weaken a gate step: no `continue-on-error: true`, `|| true`, `if: false`, removed jobs, or narrowed `paths` filters to get green.
 - Set `permissions:` explicitly, starting from `contents: read`, and grant more only to the job that needs it.
 - Secrets go in `env:` on the step or job that uses them, never at workflow level. Never print them, and never run pull request code with secrets (`pull_request_target` plus a checkout of the PR head).
