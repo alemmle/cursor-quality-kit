@@ -16,9 +16,25 @@ has_dep() {
   node -e "const p=require('./package.json');process.exit({...p.dependencies,...p.devDependencies}[process.argv[1]]?0:1)" "$1"
 }
 in_ci() { [ -n "${CI:-}" ] && [ "${CI}" != "0" ] && [ "${CI}" != "false" ]; }
+require_node_modules() {
+  local pkg dir
+  while IFS= read -r pkg; do
+    [ -n "$pkg" ] || continue
+    dir="$(dirname "$pkg")"
+    if [ ! -d "$dir/node_modules" ]; then
+      echo "verify: dependencies not installed, run npm ci" >&2
+      exit 1
+    fi
+  done <<EOF
+$(find . \( -name node_modules -o -name .git -o -name .quality-kit \) -prune -o -name package.json -print)
+EOF
+}
 
 step "Regression guard"
 ./.ai/bin/guard.sh --worktree
+
+step "Node modules"
+require_node_modules
 
 step "Dependencies match the Expo SDK"
 CI=1 npx expo install --check

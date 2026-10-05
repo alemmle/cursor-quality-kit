@@ -2,6 +2,15 @@
 
 Versioning policy: [docs/VERSIONING.md](docs/VERSIONING.md).
 
+## 2.0.0
+
+stack=none runs the verification gate in CI, and a local skip is not "done" unless a CI job covers it.
+
+- Reusable workflow `verify.yml`: `npm ci` (and Flutter when `pubspec.yaml` is present or `setup-flutter` is true), then `./scripts/verify.sh`. Inputs: `install-directory` (for a `package.json` that is not at the repo root, e.g. Reebay `web/`), `node-version`, `setup-flutter`. The generic `ai-quality.yml` calls it. `node-quality.yml` and `flutter-quality.yml` are unchanged.
+- `check-install.sh` fails when no workflow runs `scripts/verify.sh` (a `run:` of that script, or a `uses:` of `verify.yml` / `node-quality.yml` / `flutter-quality.yml`). A stack=none install that never invoked the gate can no longer stay green on constitution alone.
+- `scripts/verify.sh` templates fail immediately with `dependencies not installed, run npm ci` when a `package.json` exists and `node_modules` does not.
+- Constitution Article 6.7: if a verification stage could not run locally, the agent MUST name the CI job that runs it; if no such job exists, the task is not done. `verify-before-done`, the always-on constitution rule, `code-review`, and acceptance blockers match.
+
 ## 1.11.0
 
 Four DORA agent practices from the catalog fit-gap. Judged in `code-review`; the regression guard does not gain new patterns.

@@ -437,6 +437,7 @@ EOF
     ;;
   *)
     echo "  1. Edit scripts/verify.sh and add this project's format, lint, typecheck and test commands."
+    echo "  2. If package.json is not at the repo root, set install-directory on the verify job in .github/workflows/ai-quality.yml."
     ;;
 esac
 cat <<'EOF'

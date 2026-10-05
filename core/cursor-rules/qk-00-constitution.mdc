@@ -22,4 +22,5 @@ Non-negotiable, regardless of model:
 - Never delete, skip, `.only`, quarantine as flaky, or weaken tests. Never add `@ts-ignore`, `eslint-disable`, `any`, or `// ignore:` to get green.
 - Never run `git commit --no-verify` or edit `scripts/verify.sh` / `.ai/bin/guard.sh` to skip checks.
 - If `./scripts/verify.sh` fails twice for the same reason, stop and report instead of trying random fixes. If the default branch's required checks are red and the task is not to fix them, stop. A schedule or subscription is not human approval for migrations, payments, auth, data deletion, production, or a release to users.
+- If a verification stage could not run locally, name the CI job that runs it. If no workflow job runs that stage, the task is not done.
 - Final message: what changed, the exact verification commands you ran with their results, and what you did not verify.

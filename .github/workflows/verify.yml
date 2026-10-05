@@ -1,0 +1,64 @@
+# Reusable: installs dependencies, then runs scripts/verify.sh in the caller.
+# For stack=none, and for repositories whose package.json is not at the root
+# (pass install-directory, e.g. web/).
+name: Verify
+
+on:
+  workflow_call:
+    inputs:
+      install-directory:
+        description: Directory containing package.json or pubspec.yaml
+        type: string
+        default: .
+      node-version:
+        type: string
+        default: '22'
+      setup-flutter:
+        description: Install Flutter before running the gate (also on when pubspec.yaml is in install-directory)
+        type: boolean
+        default: false
+      flutter-version:
+        description: Exact Flutter version (empty = latest on the channel)
+        type: string
+        default: ''
+      channel:
+        type: string
+        default: stable
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        if: ${{ hashFiles(format('{0}/package.json', inputs.install-directory)) != '' }}
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: npm
+          cache-dependency-path: ${{ inputs.install-directory }}/package-lock.json
+
+      - name: npm ci
+        if: ${{ hashFiles(format('{0}/package.json', inputs.install-directory)) != '' }}
+        working-directory: ${{ inputs.install-directory }}
+        run: npm ci
+
+      - uses: subosito/flutter-action@v2
+        if: ${{ inputs.setup-flutter || hashFiles(format('{0}/pubspec.yaml', inputs.install-directory)) != '' }}
+        with:
+          channel: ${{ inputs.channel }}
+          flutter-version: ${{ inputs.flutter-version }}
+          cache: true
+
+      - name: flutter pub get
+        if: ${{ inputs.setup-flutter || hashFiles(format('{0}/pubspec.yaml', inputs.install-directory)) != '' }}
+        working-directory: ${{ inputs.install-directory }}
+        run: flutter pub get
+
+      - name: scripts/verify.sh
+        run: ./scripts/verify.sh
+        env:
+          CI: 'true'

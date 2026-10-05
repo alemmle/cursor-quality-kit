@@ -16,9 +16,25 @@ has_dep() {
 }
 script_of() { node -e "process.stdout.write((require('./package.json').scripts||{})[process.argv[1]]||'')" "$1"; }
 in_ci() { [ -n "${CI:-}" ] && [ "${CI}" != "0" ] && [ "${CI}" != "false" ]; }
+require_node_modules() {
+  local pkg dir
+  while IFS= read -r pkg; do
+    [ -n "$pkg" ] || continue
+    dir="$(dirname "$pkg")"
+    if [ ! -d "$dir/node_modules" ]; then
+      echo "verify: dependencies not installed, run npm ci" >&2
+      exit 1
+    fi
+  done <<EOF
+$(find . \( -name node_modules -o -name .git -o -name .quality-kit \) -prune -o -name package.json -print)
+EOF
+}
 
 step "Regression guard"
 ./.ai/bin/guard.sh --worktree
+
+step "Node modules"
+require_node_modules
 
 # Stage 1: types
 if has_dep prettier; then

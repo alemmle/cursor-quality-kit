@@ -59,6 +59,8 @@ repo="$work/install-none"
 expect "none: cursor-project skill installed" test -f "$repo/.claude/skills/cursor-project/SKILL.md"
 # shellcheck disable=SC2016 # literal backticks
 expect "none: cursor-project listed in AGENTS.md" grep -qF -- '- `cursor-project` -' "$repo/AGENTS.md"
+expect "none: workflow points at verify.yml" grep -q 'alemmle/cursor-quality-kit/.github/workflows/verify.yml@main' "$repo/.github/workflows/ai-quality.yml"
+expect "none: constitution requires naming the CI job" grep -q 'name the CI job that runs that stage' "$repo/.ai/CONSTITUTION.md"
 expect "none: constitution binds coordinator shared context" grep -q 'uncommitted tool workspace or coordinator shared context' "$repo/.ai/CONSTITUTION.md"
 expect "none: constitution treats a subscription as not approval" grep -q 'A schedule, a chat or pull-request subscription' "$repo/.ai/CONSTITUTION.md"
 expect "none: constitution requires a grammar check" grep -q 'Article 15 - User-facing language' "$repo/.ai/CONSTITUTION.md"
@@ -140,6 +142,34 @@ expect "own git hook: --force replaces it" grep -q 'cursor-quality-kit' "$repo/.
 repo="$work/install-expo-eas-neon"
 echo "$((RANDOM)) drift" >>"$repo/.ai/CONSTITUTION.md"
 expect_fail "check-install detects drift" 'constitution differs' "$KIT/scripts/check-install.sh" "$repo"
+
+echo "verify gate in CI and node_modules"
+repo="$(new_repo no-verify-job)"
+"$KIT/scripts/install.sh" --stack none "$repo" >/dev/null
+# constitution-only workflow: no job runs scripts/verify.sh
+cat >"$repo/.github/workflows/ai-quality.yml" <<'EOF'
+name: AI quality gate
+on: [push]
+jobs:
+  constitution:
+    uses: alemmle/cursor-quality-kit/.github/workflows/constitution.yml@main
+EOF
+expect_fail "check-install: no verify job fails" 'no CI job runs scripts/verify.sh' "$KIT/scripts/check-install.sh" "$repo"
+mkdir -p "$repo/.github/workflows"
+printf '%s\n' 'name: ci' 'on: [push]' 'jobs:' '  test:' '    runs-on: ubuntu-latest' '    steps:' '      - run: ./scripts/verify.sh' >"$repo/.github/workflows/ci.yml"
+expect "check-install: direct verify.sh run counts" "$KIT/scripts/check-install.sh" "$repo"
+
+repo="$(new_repo missing-nm)"
+"$KIT/scripts/install.sh" --stack none "$repo" >/dev/null
+printf '{"name":"app"}\n' >"$repo/package.json"
+expect_fail "verify: package.json without node_modules" 'dependencies not installed, run npm ci' "$repo/scripts/verify.sh"
+mkdir "$repo/node_modules"
+expect_fail "verify: node_modules present still runs project checks" 'no project checks yet' "$repo/scripts/verify.sh"
+mkdir -p "$repo/web"
+printf '{"name":"web"}\n' >"$repo/web/package.json"
+rm -rf "$repo/node_modules"
+mkdir "$repo/node_modules"
+expect_fail "verify: nested package.json without node_modules" 'dependencies not installed, run npm ci' "$repo/scripts/verify.sh"
 
 echo "guard"
 repo="$(new_repo guard)"

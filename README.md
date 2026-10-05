@@ -9,7 +9,7 @@ Stack packs:
 - `expo-eas-neon`: Expo / React Native iOS apps built with EAS, backed by Neon Postgres
 - `flutter`: Flutter / Dart apps
 - `backend`: TypeScript Node API backed by Neon Postgres
-- `none`: constitution, guard, and hooks only (add your own `scripts/verify.sh` checks)
+- `none`: constitution, guard, hooks, and `verify.yml` (add your own `scripts/verify.sh` checks; set `install-directory` when `package.json` is not at the root)
 
 Why this exists and how to use it with Grok: [docs/GROK-PLAYBOOK.md](docs/GROK-PLAYBOOK.md). DORA fit-gap: [docs/DORA-FIT-GAP.md](docs/DORA-FIT-GAP.md).
 
@@ -70,7 +70,7 @@ For Flutter use `--stack flutter`; for anything else use `--stack none` and put 
    The Roll out workflow runs on every new `VERSION` or `rollout/` change on `main`, or by hand under Actions > Roll out. It runs `scripts/rollout.sh`, which clones each repository, deletes the superseded paths, and runs `install.sh`. It then opens a draft pull request from `quality-kit/install`, or refreshes the one already open. Try it without pushing: `scripts/rollout.sh --dry-run alemmle/my-app`.
    It needs the Actions secret `KIT_BOT_TOKEN`: a fine-grained personal access token with **Contents**, **Pull requests** and **Workflows** read and write on the app repositories, and **Contents** and **Pull requests** read and write on this repository. The same token runs the harvest. A new app needs only a `.conf` file here; merging it opens the install pull request. The click-by-click version, including the local hook command, is [docs/HOW-TO-NEW-APP.md](docs/HOW-TO-NEW-APP.md).
 
-3. **Require the checks.** In each repository's branch protection (or a ruleset for all repositories), require the `constitution` and `verify` checks from the "AI quality gate" workflow on `main`.
+3. **Require the checks.** In each repository's branch protection (or a ruleset for all repositories), require the `constitution` and `verify` checks from the "AI quality gate" workflow on `main`. stack=none gets `verify` from `verify.yml`; Expo and backend from `node-quality.yml`; Flutter from `flutter-quality.yml`.
 4. **Create the override labels** humans use to approve exceptions: `ai-test-deletion-approved`, `ai-gate-change-approved`, `ai-migration-edit-approved`.
 5. **Pin a version.** Tag releases here (the `release` workflow tags `vX.Y.Z` from `VERSION` and moves `vX`) and install with `--kit-ref v1` so a change to the kit cannot break every repository at once.
 6. **Global fallback in Cursor.** For repositories that do not have the kit yet, paste the hard rules from [CONSTITUTION.md](CONSTITUTION.md) into Cursor Settings > Rules (user rules), or into team rules in the Cursor dashboard if you are on a team plan.
@@ -167,7 +167,7 @@ core/                      installed in every repository
   templates/               PROJECT_STATE.md, PR template, generic verify.sh and workflow, agent-hooks/
 shared/                    rules, skills, templates reused by several stacks (stack.conf picks them)
 stacks/<stack>/            stack.conf, AGENTS section, Cursor rules, skills, project templates
-.github/workflows/         reusable: constitution.yml, node-quality.yml, flutter-quality.yml;
+.github/workflows/         reusable: constitution.yml, verify.yml, node-quality.yml, flutter-quality.yml;
                            self-test.yml, release.yml, harvest.yml, rollout.yml
 scripts/install.sh         install / update a repository
 scripts/check-install.sh   drift check used by CI
