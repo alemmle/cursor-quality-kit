@@ -1,6 +1,6 @@
 # AI Code Constitution
 
-Version: 2.1.0
+Version: 2.1.1
 
 This constitution binds every AI coding agent (Cursor, Claude Code, Codex, Copilot, Gemini, Windsurf, Cline, Aider, ...) and every model (Grok, Claude, GPT, Gemini, ...) working in a repository that includes it. It is model-agnostic on purpose: the rules describe observable behavior, and the important ones are enforced by scripts and CI, not by trust.
 
