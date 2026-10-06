@@ -2,6 +2,13 @@
 
 Versioning policy: [docs/VERSIONING.md](docs/VERSIONING.md).
 
+## 2.1.1
+
+`verify.yml` works in repositories whose Actions settings allow only GitHub-owned actions.
+
+- `verify.yml` installed Flutter with `subosito/flutter-action`. GitHub checks every action a workflow references when the run starts, including steps that would be skipped, so a Node-only stack=none repository with that setting failed at startup (Reebay). Flutter now comes from a shallow `git clone` of `flutter/flutter` at `flutter-version` or `channel`. Inputs and behavior are unchanged.
+- Self-test: `constitution.yml`, `verify.yml` and `node-quality.yml` may only use `actions/*`. `flutter-quality.yml` still uses `subosito/flutter-action`; a Flutter repository with restricted Actions settings must allow `subosito/flutter-action@*`.
+
 ## 2.1.0
 
 The dependency check in `scripts/verify.sh` moves to the kit-managed `.ai/bin/deps.sh` and stops failing on layouts that are installed correctly.

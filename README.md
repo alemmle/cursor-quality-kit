@@ -56,7 +56,7 @@ For Flutter use `--stack flutter`; for anything else use `--stack none` and put 
 
 ## Apply it to all repositories
 
-1. **Make this repository reachable from your other repositories' workflows.** If it is public, nothing to do. If it is private, open this repository's Settings > Actions > General > Access and allow access from repositories owned by you (or your organization).
+1. **Make this repository reachable from your other repositories' workflows.** If it is public, nothing to do. If it is private, open this repository's Settings > Actions > General > Access and allow access from repositories owned by you (or your organization). If a repository allows only selected actions, the kit's Node and stack=none workflows need nothing extra (they use only GitHub-owned actions); the Flutter stack needs `subosito/flutter-action@*` in its allow list.
 2. **Roll out to your repositories.** Every repository that uses the kit has a file `rollout/<owner>__<name>.conf` here:
 
    ```text

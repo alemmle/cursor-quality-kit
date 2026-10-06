@@ -1,6 +1,7 @@
 # Reusable: installs dependencies, then runs scripts/verify.sh in the caller.
 # For stack=none, and for repositories whose package.json is not at the root
 # (pass install-directory, e.g. web/).
+# Uses only GitHub-owned actions (tests/run.sh checks this).
 name: Verify
 
 on:
@@ -46,12 +47,18 @@ jobs:
         working-directory: ${{ inputs.install-directory }}
         run: npm ci
 
-      - uses: subosito/flutter-action@v2
+      # Flutter comes from a git clone, not a marketplace action: this workflow may only
+      # reference GitHub-owned actions, so repositories whose Actions settings allow
+      # nothing else can still call it (a referenced action is checked even when its
+      # step would be skipped).
+      - name: Install Flutter
         if: ${{ inputs.setup-flutter || hashFiles(format('{0}/pubspec.yaml', inputs.install-directory)) != '' }}
-        with:
-          channel: ${{ inputs.channel }}
-          flutter-version: ${{ inputs.flutter-version }}
-          cache: true
+        env:
+          FLUTTER_REF: ${{ inputs.flutter-version != '' && inputs.flutter-version || inputs.channel }}
+        run: |
+          git clone --quiet --depth 1 --branch "$FLUTTER_REF" https://github.com/flutter/flutter.git "$RUNNER_TEMP/flutter"
+          echo "$RUNNER_TEMP/flutter/bin" >>"$GITHUB_PATH"
+          "$RUNNER_TEMP/flutter/bin/flutter" --version
 
       - name: flutter pub get
         if: ${{ inputs.setup-flutter || hashFiles(format('{0}/pubspec.yaml', inputs.install-directory)) != '' }}

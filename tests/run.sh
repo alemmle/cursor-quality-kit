@@ -432,6 +432,11 @@ v="$(tr -d '[:space:]' <"$KIT/VERSION")"
 expect "VERSION matches CONSTITUTION.md" grep -qx "Version: $v" "$KIT/CONSTITUTION.md"
 expect "VERSION has a CHANGELOG entry" grep -qx "## $v" "$KIT/CHANGELOG.md"
 expect "kit records DORA fit-gap" test -f "$KIT/docs/DORA-FIT-GAP.md"
+# Repositories whose Actions settings allow only GitHub-owned actions must still be able to
+# call these. GitHub checks every referenced action at startup, even in skipped steps.
+for wf in constitution.yml verify.yml node-quality.yml; do
+  expect "$wf uses only GitHub-owned actions" bash -c "! grep -E '^[[:space:]]*-?[[:space:]]*uses:' '$KIT/.github/workflows/$wf' | grep -vE 'uses:[[:space:]]*actions/'"
+done
 expect "security rule runs existing scanner" grep -q 'Do not add a second scanner' "$KIT/core/cursor-rules/qk-02-security.mdc"
 
 printf '\n%d passed, %d failed\n' "$passed" "$failed"
