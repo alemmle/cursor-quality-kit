@@ -1,0 +1,16 @@
+---
+description: Default text that users can rename (titles, names) must follow the current app language without rewriting stored data
+alwaysApply: false
+globs:
+  - "lib/**"
+  - "app/**"
+---
+
+# Default text in more than one language
+
+- A default the user never changed is shown through one accessor that returns the user's text when it was edited, else the default in the requested language. Screens never read the stored field directly.
+- Keep an explicit "edited" flag next to the stored text. Comparing the text to known defaults breaks once a second language exists.
+- Do not clear or rewrite the stored default to make this work. Older builds and a revert still read the stored value, so changing it makes the rollback unsafe.
+- Business logic that matches on the default words (keyword rules, suggestions) keeps reading the stored value until it is rewritten to use a stable key or role.
+- Pin the first language's defaults byte for byte in a test when you move them into the catalogue.
+- A new record field that is set automatically on create (language, timestamps) must be excluded from "untouched draft" or "has unsaved edits" checks, with a test.
