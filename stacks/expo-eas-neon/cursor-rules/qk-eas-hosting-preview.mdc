@@ -1,0 +1,18 @@
+---
+description: Deploying and checking an EAS Hosting preview backed by a Neon preview branch
+alwaysApply: false
+globs:
+  - "docs/ops.md"
+  - "server/**"
+  - "app/api/**"
+---
+
+# EAS Hosting preview with a Neon branch (checked 2026-10-08 with Expo SDK 57, eas-cli ≥ 16)
+
+- `eas deploy` uploads what is already in `dist/`. Always run `npx expo export -p web` in the same step. The deploy output names the export's age ("exported 11 hours ago"). An age older than the current command means old code went out. Docs: https://docs.expo.dev/eas/hosting/get-started/
+- Before writing migration steps for a preview branch, confirm the branch exists in the Neon console. Do not assume a runbook that says it does.
+- The preview environment's `DATABASE_URL` in EAS must be the pooled connection string of that branch. A variable set before the branch was created points nowhere.
+- A health route that answers `backend: neon` with `ok: false` means the variable is set but its query fails: wrong branch, wrong string, or a missing table.
+- Check a preview in this order: the commit (`git log -1`), the export, the deploy, the health route, then one data route. Each step rules out the one before.
+- An editorial-content migration is applied and seeded on the preview branch first. Production follows only after the preview routes return the expected data.
+- When the agent's environment cannot reach the preview URL, ask the person for the JSON of the health and data routes, not a screenshot of the app. Identical seed data looks the same in the app either way.
