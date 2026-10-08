@@ -1,0 +1,15 @@
+---
+description: Node script tests with promises - a pending promise can end the process with exit 0 and silently skip checks; superseded async work must not apply late
+globs:
+  - "tests/**"
+  - "scripts/test-*"
+alwaysApply: false
+---
+
+# Async checks in plain Node test scripts
+
+- Node exits with code 0 when the event loop empties, even if `main()` is still waiting on a promise that will never resolve. Every check after that await is skipped and the run looks green.
+- Set a `finished` flag as the last line of `main()`, and in `process.on("exit")` set `process.exitCode = 1` when it is false.
+- Count the printed check ids against the ids in the file before trusting a new test.
+- A test that holds several fake requests open must keep a list of their resolvers. A single variable gets overwritten, and the first request never resolves.
+- Async work that a newer call can supersede (a refresh after a language or account switch) takes a generation number. It applies its result only while it is still the newest call. Test it with a slow older call that finishes after a fast newer one.
