@@ -1,0 +1,13 @@
+---
+description: Stacked pull requests merge into their base branch, not the default branch; how to land a stack without losing work
+alwaysApply: true
+---
+
+# Stacked pull requests
+
+- Open a pull request against the default branch whenever it does not need another open pull request's code. A stack is the exception, not the default.
+- A stacked pull request merges into its base branch. If the lower pull request merged first, the upper one lands on a branch nobody ships, and the default branch never gets it.
+- Retarget the upper pull request to the default branch right after the lower one merges, and before anyone merges the upper one. Retargeting in the same minute as a merge can lose the race.
+- After every merge in a stack, check that each commit reached the default branch (`git merge-base --is-ancestor <sha> origin/<default>`). Do not trust "merged" in the pull request event.
+- When work landed on a dead stack branch, open one new pull request from that branch to the default branch. Do not cherry-pick or re-push the commits under new hashes.
+- Say in the pull request body which pull request it sits on, so the person merging knows the order.
