@@ -2,6 +2,10 @@
 
 Versioning policy: [docs/VERSIONING.md](docs/VERSIONING.md).
 
+## 2.2.1
+
+- `install.sh`: a `.ai/SKIP_TEMPLATES` line still matches with Windows (CRLF) line ends, surrounding spaces or a trailing `# comment`. Before, such a line did not match and the removed template came back without a message (review note on 2.2.0).
+
 ## 2.2.0
 
 CI costs fewer minutes per push. Lessons from Amigos (2026-10-10), where a push cost about 19 billed minutes and now costs about 4.
