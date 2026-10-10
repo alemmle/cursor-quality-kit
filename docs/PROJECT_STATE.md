@@ -6,6 +6,7 @@ Central repository for the AI Code Constitution (version in `VERSION`) and the r
 
 ## Status
 
+- Constitution v2.2.1 (see `CHANGELOG.md`): `.ai/SKIP_TEMPLATES` lines tolerate CRLF, surrounding spaces and a trailing `# comment`.
 - Constitution v2.2.0 (see `CHANGELOG.md`): CI minutes. Rule `qk-ci-minutes` (always on): one job runs the gate, test tools are pinned devDependencies instead of `npx --yes`, a pull request branch takes the default branch only on a conflict or before the merge. `ai-quality.yml` templates cancel a superseded pull request run. `.ai/SKIP_TEMPLATES` lists "created once" templates `install.sh` must not create (Amigos removed `neon-preview-db.yml`, which GitHub refused to start there). `check-install.sh` warns when more than one workflow runs the gate and no longer counts a comment as a gate run. Measured in Amigos on 2026-10-10: about 19 billed minutes per push before, about 4 after.
 - Constitution v2.1.1 (see `CHANGELOG.md`): `verify.yml`, `node-quality.yml` and `constitution.yml` reference only GitHub-owned actions, so they start in repositories that allow nothing else. `flutter-quality.yml` needs `subosito/flutter-action@*` allowed.
 - Constitution v2.1.0 (see `CHANGELOG.md`): the dependency check is the managed `.ai/bin/deps.sh`. It skips ignored paths and workspace members, names the install command for the lockfile, and fails locally when the install is older than the lockfile.
