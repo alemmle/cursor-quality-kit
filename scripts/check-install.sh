@@ -48,15 +48,22 @@ else fail "scripts/verify.sh missing or not executable"
 fi
 
 ci_runs_verify=0
+gate_workflows=""
 if [ -d .github/workflows ]; then
   for f in .github/workflows/*.yml .github/workflows/*.yaml; do
     [ -f "$f" ] || continue
-    if grep -q 'scripts/verify\.sh' "$f"; then ci_runs_verify=1; break; fi
-    if grep -qE 'workflows/(verify|node-quality|flutter-quality)\.yml@' "$f"; then ci_runs_verify=1; break; fi
+    # Comment lines do not run anything.
+    if grep -v '^[[:space:]]*#' "$f" | grep -qE 'scripts/verify\.sh|workflows/(verify|node-quality|flutter-quality)\.yml@'; then
+      ci_runs_verify=$((ci_runs_verify + 1))
+      gate_workflows="$gate_workflows ${f#.github/workflows/}"
+    fi
   done
 fi
-if [ "$ci_runs_verify" = "1" ]; then pass "CI runs scripts/verify.sh"
+if [ "$ci_runs_verify" -ge 1 ]; then pass "CI runs scripts/verify.sh"
 else fail "no CI job runs scripts/verify.sh. Call verify.yml, node-quality.yml, or flutter-quality.yml, or run ./scripts/verify.sh in a workflow."
+fi
+if [ "$ci_runs_verify" -gt 1 ]; then
+  echo "  WARN  scripts/verify.sh runs in $ci_runs_verify workflows:$gate_workflows. Each push pays for the same gate twice; keep one (rule qk-ci-minutes)."
 fi
 
 if [ -f .ai/KIT_VERSION ]; then

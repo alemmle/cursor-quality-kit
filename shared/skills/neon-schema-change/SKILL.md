@@ -27,7 +27,7 @@ Read the SQL. Look for unintended `DROP`, table rewrites, and missing defaults. 
 ## 3. Test on a Neon branch
 
 - Locally: use a Neon dev branch (`neonctl branches create --name dev/<you>` if `neonctl` is installed) and point `DATABASE_URL` at it. Never the production branch.
-- In CI: the `neon-preview-db` workflow creates a branch per pull request, runs migrations against it, and deletes it when the PR closes.
+- In CI, when the repository has the `neon-preview-db` workflow: it creates a branch per pull request, runs migrations against it, and deletes it when the PR closes. A repository that lists it in `.ai/SKIP_TEMPLATES` has no per-PR branch; apply the migration to a Neon branch by hand or with the project's own migration workflow, and say which in the report.
 - Add or update tests for the repository/query module and the API routes that use the changed tables.
 
 ## 4. Report
