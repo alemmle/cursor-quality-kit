@@ -1,0 +1,14 @@
+---
+description: Keep CI fast and cheap - one job runs the gate, test tools are installed and pinned, a pull request branch takes the default branch only when it must
+alwaysApply: true
+---
+
+# CI minutes
+
+Every push to a pull request buys a full CI run. On a private repository each job is billed by the minute, rounded up, so duplicate work costs money on every push.
+
+- Exactly one workflow job runs `./scripts/verify.sh` per push. If the repository has its own workflow that runs it, remove the `verify` job from `ai-quality.yml` and keep `constitution`. Two jobs running the same gate on the same commit double the minutes and catch nothing the first run missed. `check-install.sh` warns when more than one workflow runs the gate.
+- Tools that `package.json` scripts and test runners call (`tsx`, `ts-node`, `jest`, a linter) are devDependencies pinned in the lockfile and called by name. `npx --yes <tool>` for a package that is not installed looks it up online on every call and runs whatever version is newest. One gate with about 190 such calls spent more than half its time there.
+- Bring the default branch into a pull request branch only when GitHub reports a conflict, or right before the merge when the repository requires an up-to-date branch. A merge commit made only to stay current buys another full run.
+- Before splitting the gate across several machines, check the bill: every machine installs dependencies again and is rounded up on its own, so the wait gets shorter and the bill gets larger.
+- Before skipping CI for some paths (docs-only changes, drafts), check what the tests read: a test that reads documentation turns red on a docs edit. A workflow skipped by a `paths` filter leaves its required check pending, which blocks the merge.

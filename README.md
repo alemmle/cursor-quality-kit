@@ -34,7 +34,7 @@ Why this exists and how to use it with Grok: [docs/GROK-PLAYBOOK.md](docs/GROK-P
 | Stack templates | Expo: `eslint.config.js`, `jest.config.js`, `.maestro/`, `.eas/workflows/`, Neon preview DB workflow. Flutter: `analysis_options.yaml` | created once |
 | `docs/PROJECT_STATE.md`, `.github/pull_request_template.md` | Living project state, PR checklist | created once |
 
-"Created once" files are yours to adapt. Pass `--force` to overwrite them with the kit version.
+"Created once" files are yours to adapt. Pass `--force` to overwrite them with the kit version. List a created-once path in `.ai/SKIP_TEMPLATES` (one per line) and the installer never creates it, not even with `--force`.
 
 ## Install in one repository
 

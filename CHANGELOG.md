@@ -2,6 +2,16 @@
 
 Versioning policy: [docs/VERSIONING.md](docs/VERSIONING.md).
 
+## 2.2.0
+
+CI costs fewer minutes per push. Lessons from Amigos (2026-10-10), where a push cost about 19 billed minutes and now costs about 4.
+
+- New always-on rule `qk-ci-minutes`: exactly one workflow job runs `scripts/verify.sh` per push (a repository with its own CI workflow drops `verify` from `ai-quality.yml` and keeps `constitution`); tools that scripts and test runners call are devDependencies pinned in the lockfile, never `npx --yes <tool>` (Amigos: about 190 calls, each looking `tsx` up online, more than half of the gate's time); bring the default branch into a pull request branch only on a conflict or right before the merge; check the bill before splitting the gate across machines, and check what tests read before skipping paths.
+- `ai-quality.yml` templates (generic, expo-eas-neon, backend, flutter) cancel a superseded pull request run with `concurrency`; runs on the default branch finish. Created-once file: existing repositories add the block by hand.
+- `install.sh` skips every "created once" template listed in the repository's `.ai/SKIP_TEMPLATES` (one path per line, `#` comments), also with `--force`. A repository can remove a template such as `neon-preview-db.yml` without a re-install or rollout putting it back.
+- `check-install.sh` prints a warning (not a failure) when more than one workflow runs the gate, and no longer counts a comment that names `scripts/verify.sh` as a workflow that runs it.
+- `neon-schema-change`: the per-PR Neon branch exists only when the repository has the `neon-preview-db` workflow.
+
 ## 2.1.1
 
 `verify.yml` works in repositories whose Actions settings allow only GitHub-owned actions.

@@ -205,6 +205,10 @@ managed() {
 # template <src> <dest-rel>: created once, kept afterwards unless --force
 template() {
   local dest="$target/$2"
+  if [ -f "$target/.ai/SKIP_TEMPLATES" ] && grep -v '^[[:space:]]*#' "$target/.ai/SKIP_TEMPLATES" | grep -qxF "$2"; then
+    say skipped "$2 (listed in .ai/SKIP_TEMPLATES)"
+    return
+  fi
   if [ -e "$dest" ] && [ "$force" != "1" ]; then
     say kept "$2 (exists; use --force to overwrite)"
     return
