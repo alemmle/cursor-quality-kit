@@ -179,6 +179,11 @@ expect "SKIP_TEMPLATES: other templates still created" test -f "$repo/.github/wo
 expect "SKIP_TEMPLATES: --force does not create it either" bash -c "'$KIT/scripts/install.sh' --stack backend --force '$repo' | grep -q 'skipped  .github/workflows/neon-preview-db.yml'"
 expect "SKIP_TEMPLATES: still absent after --force" test ! -e "$repo/.github/workflows/neon-preview-db.yml"
 expect "SKIP_TEMPLATES: check-install passes" "$KIT/scripts/check-install.sh" "$repo"
+repo="$(new_repo skip-templates-loose)"
+mkdir -p "$repo/.ai"
+printf '%s\r\n' '  .github/workflows/neon-preview-db.yml   # removed until it works' >"$repo/.ai/SKIP_TEMPLATES"
+expect "install with a CRLF, indented, commented SKIP_TEMPLATES line" "$KIT/scripts/install.sh" --stack backend "$repo"
+expect "SKIP_TEMPLATES: CRLF, spaces and an inline comment still skip" test ! -e "$repo/.github/workflows/neon-preview-db.yml"
 
 repo="$(new_repo missing-nm)"
 "$KIT/scripts/install.sh" --stack none "$repo" >/dev/null
