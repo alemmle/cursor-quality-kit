@@ -205,7 +205,9 @@ managed() {
 # template <src> <dest-rel>: created once, kept afterwards unless --force
 template() {
   local dest="$target/$2"
-  if [ -f "$target/.ai/SKIP_TEMPLATES" ] && grep -v '^[[:space:]]*#' "$target/.ai/SKIP_TEMPLATES" | grep -qxF "$2"; then
+  # One path per line; CR line ends, surrounding spaces and `#` comments are ignored.
+  if [ -f "$target/.ai/SKIP_TEMPLATES" ] &&
+    tr -d '\r' <"$target/.ai/SKIP_TEMPLATES" | sed -e 's/#.*//' -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | grep -qxF "$2"; then
     say skipped "$2 (listed in .ai/SKIP_TEMPLATES)"
     return
   fi
